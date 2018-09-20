@@ -21,3 +21,4 @@ Application commands
 | `setport new_port`           | change the port                     | `setport 5656`       |
 | `join`                       | sending join commands to neighbours |                      |
 | `leave`                      | sending leave commands to neighbours|                      |
+| `search file_name`           | file search from neighbours         | `search baby.mp3`    |
