@@ -3,7 +3,7 @@
 Compile the application, From project root 
 ```
 cd src
-javac com.company.Client.java
+javac -cp . com/company/Client.java
 ```
 
 Then run
