@@ -6,6 +6,16 @@ public class Node {
     private int port;
     private String userName;
 
+    public Node(String ip, String port, String userName) {
+        this.ip = ip;
+        this.port = Integer.parseInt(port);
+        this.userName = userName;
+    }
+
+    public String getKey(){
+        return ip+":"+port;
+    }
+
     public String getIp() {
         return ip;
     }
@@ -28,5 +38,14 @@ public class Node {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    @Override
+    public String toString() {
+        return "Node[ " +
+                "ip='" + ip + '\'' +
+                ", port=" + port +
+                ", userName='" + userName + '\'' +
+                " ]";
     }
 }

@@ -1,10 +1,8 @@
 package com.company;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.net.*;
-import java.util.Scanner;
-import java.util.StringTokenizer;
 
 import static com.company.Util.*;
 
@@ -21,61 +19,106 @@ public class Client {
     public static int bs_port=55555;
     public static String bs_ip;
 
+    public static HashMap<String,Node> routingTable= new HashMap<String,Node>();
+
+    public static boolean okToListen=false;
+
+    static Thread listeningThread;
+    static Thread cliThread;
 
     public static void main(String[] args) throws SocketException {
 
         scanner =new Scanner(System.in);
 
-        echo("enter port : "); myPort= scanner.nextInt();
-        echo("enter username : "); myUserName= scanner.next();
+        myIp=getMyIp();
+
+        while (myPort==0){
+            try {
+                echo("Enter port : ");
+                myPort= Integer.parseInt(scanner.next());
+                socket = new DatagramSocket(myPort);
+            }catch (BindException e){
+                echon("Permission denied. Use a different port\n");
+                myPort=0;
+            }catch (NumberFormatException e){
+                echon("Wrong input for port\n");
+                myPort=0;
+            }
+        }
+
+        echo("Enter username : ");
+        myUserName= scanner.next();
         scanner.nextLine();
-        socket = new DatagramSocket(myPort);
-        myIp=getMyIp(); echon("\033[1;30m"+"ip address : " + myIp + " \tport : " +myPort + " \tusername : " +myUserName+"\033[0m\n");
 
-        Thread thread = new Thread(Client::lookForMessages);
-        thread.start();
+        listeningThread = new Thread(Client::lookForMessages);
+        listeningThread.start();
 
-        Thread thread2 = new Thread(Client:: handleInterfaceInput);
-        thread2.start();
+        echoni("\033[1;30m"+"IP address : " + myIp + " \tPort : " +myPort + " \tUsername : " +myUserName+"\033[0m\n");
+
+        cliThread = new Thread(Client:: handleInterfaceInput);
+        cliThread.start();
 
     }
 
     private static void handleInterfaceInput() {
 
         while (true){
-            echo("> ");String input = scanner.nextLine();
-            StringTokenizer st = new StringTokenizer(input, " ");
             try {
+                String input = scanner.nextLine();
+                StringTokenizer st = new StringTokenizer(input, " ");
                 switch (st.nextToken()) {
+                    case "exit":
+                        SendingMessageHandler.exit();
+                        System.exit(0);
+                        break;
+                    case "setport":
+                        changeMyPort(st.nextToken());
+                        break;
+                    case "table":
+                        showRoutingTable();
+                        break;
                     case "reg":
-                        echon("Register command...");
+                        echon("Register command");
                         SendingMessageHandler.registerToBS(st.nextToken());
                         break;
                     case "unreg":
                         echon("Unregister command");
                         SendingMessageHandler.unregisterFromBS();
                         break;
+                    case "join":
+                        echon("Joining command");
+                        SendingMessageHandler.joinToSystem();
+                        break;
+                    case "leave":
+                        echon("Leaving command");
+                        SendingMessageHandler.leaveTheSystem();
+                        break;
                 }
             }catch (NoSuchElementException e){
-                echon("Wrong command");
+                echoni("Wrong command");
             }
 
         }
     }
 
-    private static void lookForMessages() {
-        while (true){
+
+    public static void lookForMessages() {
+        okToListen=true;
+        while (okToListen){
             byte[] buffer = new byte[65536];
             DatagramPacket incoming = new DatagramPacket(buffer, buffer.length);
             try {
+
                 socket.receive(incoming);
                 byte[] data = incoming.getData();
                 String msg = new String(data, 0, incoming.getLength());
-                echo("\033[0;32m"+msg+"\033[0m"+"\n\n> ");
+                echon("\033[0;32m"+msg+"\033[0m");
                 StringTokenizer st = new StringTokenizer(msg, " ");
                 String length= st.nextToken();
                 try {
                     switch (st.nextToken()) {
+
+                            // messages from BootstrapServer
                         case "REGOK":
                             ReceivingMessageHandler.registrationOk(st);
                             break;
@@ -83,6 +126,24 @@ public class Client {
                         case "UNROK":
                             ReceivingMessageHandler.unregistrationOk(st);
                             break;
+
+                        case "JOINOK":
+                            ReceivingMessageHandler.joinOk(st, incoming);
+                            break;
+
+                        case "LEAVEOK":
+                            ReceivingMessageHandler.leaveOk(st, incoming);
+                            break;
+
+                            // messages from neighbours
+                        case "JOIN":
+                            ReceivingMessageHandler.joiningOfNeighbour(st, incoming);
+                            break;
+
+                        case "LEAVE":
+                            ReceivingMessageHandler.leavingOfNeighbour(st, incoming);
+                            break;
+
                     }
                 }catch (NoSuchElementException e){
                     echon("Wrong command");
