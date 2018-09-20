@@ -22,3 +22,4 @@ Application commands
 | `join`                       | sending join commands to neighbours |                      |
 | `leave`                      | sending leave commands to neighbours|                      |
 | `search file_name`           | file search from neighbours         | `search baby.mp3`    |
+| `exit`                       | exit program                        |                      |
