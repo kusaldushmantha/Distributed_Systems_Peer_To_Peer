@@ -90,11 +90,11 @@ public class ReceivingMessageHandler {
 
         switch (value){
             case 0:
-                echoni(incoming.getAddress()+":"+incoming.getPort()+" - Successfully removed");
+                echoni(incoming.getAddress()+":"+incoming.getPort()+" -> You were successfully removed");
                 break;
 
             case 9999:
-                echoni(incoming.getAddress()+":"+incoming.getPort()+" - Error while removing from routing table");
+                echoni(incoming.getAddress()+":"+incoming.getPort()+" -> Error while removing from routing table");
                 break;
         }
     }
@@ -171,5 +171,52 @@ public class ReceivingMessageHandler {
         }
 
         echoni("");
+    }
+
+    public static void fileSearchResult(StringTokenizer st, DatagramPacket incoming) {
+
+        int no_of_files= Integer.parseInt(st.nextToken());
+        String ip_file_owner=st.nextToken();
+        int port_file_owner= Integer.parseInt(st.nextToken());
+        String hops=st.nextToken();
+
+        String[] filenames=new String[no_of_files];
+        try {
+            for (int i=0;i<no_of_files;i++){
+                filenames[i]=st.nextToken();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        String filesStr="";
+
+        for (String file: filenames){
+            filesStr+=file+ " ";
+        }
+        echoni("Neighbour "+ip_file_owner+":"+port_file_owner+" has : "+filesStr);
+
+    }
+
+    public static void searchFileForNeighbour(StringTokenizer st, DatagramPacket incoming) {
+
+        String ip_file_needed=st.nextToken();
+        int port_file_needed= Integer.parseInt(st.nextToken());
+        String fileName=st.nextToken();
+        String hops=st.nextToken();
+
+        String[] foundFiles = searchFile(fileName);
+        String filesStr="";
+
+        for (String file: foundFiles){
+            filesStr+=file+ " ";
+        }
+
+        String msg="SEROK "+ foundFiles.length + " " + myIp + " " + myPort +" " + "hops" + " " + filesStr ;
+        String msg_formatted = formatMessage(msg);
+        sendPacket(ip_file_needed,port_file_needed,msg_formatted);
+
+        echoni("File data sent to "+ip_file_needed+":"+port_file_needed);
+
     }
 }

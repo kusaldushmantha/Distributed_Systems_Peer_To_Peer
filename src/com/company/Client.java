@@ -93,6 +93,10 @@ public class Client {
                         echon("Leaving command");
                         SendingMessageHandler.leaveTheSystem();
                         break;
+                    case "search":
+                        echon("File search command");
+                        SendingMessageHandler.searchFile(st.nextToken());
+                        break;
                 }
             }catch (NoSuchElementException e){
                 echoni("Wrong command");
@@ -118,7 +122,7 @@ public class Client {
                 try {
                     switch (st.nextToken()) {
 
-                            // messages from BootstrapServer
+                    // messages from BootstrapServer
                         case "REGOK":
                             ReceivingMessageHandler.registrationOk(st);
                             break;
@@ -126,7 +130,7 @@ public class Client {
                         case "UNROK":
                             ReceivingMessageHandler.unregistrationOk(st);
                             break;
-
+                    // messages from neighbours
                         case "JOINOK":
                             ReceivingMessageHandler.joinOk(st, incoming);
                             break;
@@ -135,7 +139,10 @@ public class Client {
                             ReceivingMessageHandler.leaveOk(st, incoming);
                             break;
 
-                            // messages from neighbours
+                        case "SEROK":
+                            ReceivingMessageHandler.fileSearchResult(st, incoming);
+                            break;
+
                         case "JOIN":
                             ReceivingMessageHandler.joiningOfNeighbour(st, incoming);
                             break;
@@ -144,9 +151,13 @@ public class Client {
                             ReceivingMessageHandler.leavingOfNeighbour(st, incoming);
                             break;
 
+                        case "SER":
+                            ReceivingMessageHandler.searchFileForNeighbour(st, incoming);
+
+
                     }
                 }catch (NoSuchElementException e){
-                    echon("Wrong command");
+                    echon("Wrong message");
                 }
 
             } catch (IOException e) {

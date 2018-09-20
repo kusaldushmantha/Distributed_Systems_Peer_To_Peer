@@ -6,6 +6,14 @@ import static com.company.Client.*;
 
 public class Util {
 
+
+    public static String[] searchFile(String filename){
+
+        // TODO: 9/20/18 implement file search
+        String[] foundFiles={"dummy1_"+myIp,"dummy2_"+myIp};
+        return foundFiles;
+    }
+
     public static String getMyIp() {
         try(final DatagramSocket socket = new DatagramSocket()){
             socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
@@ -40,7 +48,7 @@ public class Util {
                     InetAddress.getByName(ip), port);
             socket.send(dgPacket);
         } catch (IOException e) {
-            e.printStackTrace();
+            echoni("Sending failed");
         }
     }
 
