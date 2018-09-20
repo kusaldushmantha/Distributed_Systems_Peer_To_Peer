@@ -1,5 +1,6 @@
 package com.company;
 
+import java.util.Map.Entry;
 import static com.company.Client.*;
 import static com.company.Util.*;
 
@@ -23,7 +24,6 @@ public class SendingMessageHandler {
 
     /**
      *  command: unreg
-     *
      */
     public static void unregisterFromBS(){
 
@@ -34,6 +34,51 @@ public class SendingMessageHandler {
         sendPacket(bs_ip,bs_port,msg_formated);
     }
 
+    /**
+     *  command: join
+     */
+    public static void joinToSystem() {
+
+        /* length JOIN IP_address port_no */
+        String msg="JOIN "+myIp+" "+myPort;
+        String msg_formated = formatMessage(msg);
+
+        if (routingTable.size()==0){
+            echoni("No neighbours to join");
+        }else {
+
+            for (Entry<String, Node> entry : routingTable.entrySet()) {
+                sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formated);
+            }
+        }
+    }
+
+    /**
+     *  command: leave
+     */
+    public static void leaveTheSystem() {
+
+        /* length LEAVE IP_address port_no */
+        String msg="LEAVE "+myIp+" "+myPort;
+        String msg_formated = formatMessage(msg);
+
+        for (Entry<String,Node> entry: routingTable.entrySet()) {
+            sendPacket(entry.getValue().getIp(),entry.getValue().getPort(),msg_formated);
+        }
+
+    }
+
+
+    /**
+     * command: exit
+     */
+    public static void exit() {
+
+        unregisterFromBS();
+
+        leaveTheSystem();
+
+    }
 
 
 }
