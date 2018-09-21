@@ -20,7 +20,23 @@ public class SendingMessageHandler {
         String msg_formatted = formatMessage(msg);
 
         Client.bs_ip=bs_ip;
-        sendPacket(bs_ip,bs_port,msg_formatted);
+        sendPacket(bs_ip,bs_port,msg_formatted,"Register");
+    }
+
+    /**
+     * (testing purpose)
+     *
+     * command regl
+     *
+     */
+    public static void registerToBSonSameIp() {
+
+        /* length REG IP_address port_no username */
+        String msg="REG " + myIp + " " + myPort + " " + myUserName;
+        String msg_formatted = formatMessage(msg);
+
+        Client.bs_ip=myIp;
+        sendPacket(bs_ip,bs_port,msg_formatted,"Register");
     }
 
 
@@ -33,27 +49,27 @@ public class SendingMessageHandler {
         String msg="UNREG " + myIp + " " + myPort + " " + myUserName;
         String msg_formated = formatMessage(msg);
 
-        sendPacket(bs_ip,bs_port,msg_formated);
+        sendPacket(bs_ip,bs_port,msg_formated,"Unregister");
     }
-
 
     /**
      *  command: join
      */
     public static void joinToSystem() {
 
+        if (routingTable.size()==0) {
+            print_nng("No neighbours in routing table to join");
+            return;
+        }
+
         /* length JOIN IP_address port_no */
         String msg="JOIN " + myIp + " " + myPort;
         String msg_formated = formatMessage(msg);
 
-        if (routingTable.size()==0){
-            echoni("No neighbours to join");
-        }else {
-
-            for (Entry<String, Node> entry : routingTable.entrySet()) {
-                sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formated);
-            }
+        for (Entry<String, Node> entry : routingTable.entrySet()) {
+            sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formated,"Join");
         }
+
     }
 
 
@@ -62,12 +78,17 @@ public class SendingMessageHandler {
      */
     public static void leaveTheSystem() {
 
+        if (routingTable.size()==0) {
+            print_nng("No neighbours in routing table to leave");
+            return;
+        }
+
         /* length LEAVE IP_address port_no */
         String msg="LEAVE " + myIp + " " + myPort;
         String msg_formated = formatMessage(msg);
 
         for (Entry<String,Node> entry: routingTable.entrySet()) {
-            sendPacket(entry.getValue().getIp(),entry.getValue().getPort(),msg_formated);
+            sendPacket(entry.getValue().getIp(),entry.getValue().getPort(),msg_formated,"Leave");
         }
 
     }
@@ -76,16 +97,34 @@ public class SendingMessageHandler {
     /**
      *  command: search file_name
      *
-     * @param filename
+     * @param st
      */
-    public static void searchFile(String filename) {
+    public static void searchFile(StringTokenizer st) {
 
-        /* length SER IP port file_name hops */
-        String msg="SER " + myIp + " " + myPort + " " + filename + " " + "hops";
-        String msg_formated = formatMessage(msg);
+        if (routingTable.isEmpty()){
+            print_nng("No neighbours in routing table to search");
+            return;
+        }
 
-        for (Entry<String,Node> entry: routingTable.entrySet()) {
-            sendPacket(entry.getValue().getIp(),entry.getValue().getPort(),msg_formated);
+        try {
+            String filename = st.nextToken();
+            int hops=1;
+            if(st.hasMoreTokens()) {
+                try {
+                    hops = Integer.parseInt(st.nextToken());
+                }catch (NumberFormatException e){
+                    print_nng("Wrong hops value");
+                }
+            }
+            /* length SER IP port file_name hops */
+            String msg = "SER " + myIp + " " + myPort + " " + filename + " " + hops;
+            String msg_formated = formatMessage(msg);
+
+            for (Entry<String, Node> entry : routingTable.entrySet()) {
+                sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formated, "Search");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -100,6 +139,7 @@ public class SendingMessageHandler {
         leaveTheSystem();
 
     }
+
 
 
 }

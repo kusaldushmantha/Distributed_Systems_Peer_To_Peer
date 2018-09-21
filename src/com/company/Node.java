@@ -1,5 +1,7 @@
 package com.company;
 
+import java.util.StringTokenizer;
+
 public class Node {
 
     private String ip;
@@ -14,6 +16,12 @@ public class Node {
 
     public String getKey(){
         return ip+":"+port;
+    }
+
+    public boolean isEqual(String ip,int port){
+        if(port==this.port && ip.equals(this.ip)){
+            return true;
+        }return false;
     }
 
     public String getIp() {
@@ -38,6 +46,15 @@ public class Node {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+
+    public String details() {
+        return "Neighbour[ " +
+                "ip=" + ip +
+                ", port=" + port +
+//                ", userName='" + userName + '\'' +
+                " ]";
     }
 
     @Override

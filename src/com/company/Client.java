@@ -8,7 +8,7 @@ import static com.company.Util.*;
 
 public class Client {
 
-    public static int myPort;
+    public static int myPort=5556;
     public static String myIp;
     public static String myUserName;
 
@@ -18,6 +18,8 @@ public class Client {
 
     public static int bs_port=55555;
     public static String bs_ip;
+    public static boolean registered=false;
+
 
     public static HashMap<String,Node> routingTable= new HashMap<String,Node>();
 
@@ -29,31 +31,46 @@ public class Client {
     public static void main(String[] args) throws SocketException {
 
         scanner =new Scanner(System.in);
-
         myIp=getMyIp();
 
-        while (myPort==0){
-            try {
-                echo("Enter port : ");
-                myPort= Integer.parseInt(scanner.next());
-                socket = new DatagramSocket(myPort);
-            }catch (BindException e){
-                echon("Permission denied. Use a different port\n");
-                myPort=0;
-            }catch (NumberFormatException e){
-                echon("Wrong input for port\n");
-                myPort=0;
+        printName("Distributed System Client Application");
+
+        while (true) {
+            print("\nEnter port \t[" + myPort + "]\t: ");
+            String inPort=scanner.nextLine();
+            if (inPort.equals("")) {
+                try {
+                    socket = new DatagramSocket(myPort);
+                    break;
+                }catch (BindException e){
+                    print_ng("Permission denied. Use a different port");
+                    myPort++;
+                }
+            }else {
+                try {
+                    myPort= Integer.parseInt(inPort);
+                    socket = new DatagramSocket(myPort);
+                    break;
+                }catch (BindException e){
+                    print_ng("Permission denied. Use a different port");
+                }catch (NumberFormatException e){
+                    print_ng("Wrong input for port");
+                }
             }
         }
 
-        echo("Enter username : ");
-        myUserName= scanner.next();
-        scanner.nextLine();
+        myUserName=getMyHostname();
+        print("Enter username \t["+myUserName+"]\t: ");
+        String inName=scanner.nextLine();
+        if (!inName.equals("")) {
+            myUserName=inName;
+        }
+
 
         listeningThread = new Thread(Client::lookForMessages);
         listeningThread.start();
 
-        echoni("\033[1;30m"+"IP address : " + myIp + " \tPort : " +myPort + " \tUsername : " +myUserName+"\033[0m\n");
+        print_nn("\nIP address : " + myIp + " \tPort : " +myPort + " \tUsername : " +myUserName, "\033[0;1m");
 
         cliThread = new Thread(Client:: handleInterfaceInput);
         cliThread.start();
@@ -65,41 +82,47 @@ public class Client {
         while (true){
             try {
                 String input = scanner.nextLine();
+                if (input.equals(""))continue;
                 StringTokenizer st = new StringTokenizer(input, " ");
                 switch (st.nextToken()) {
-                    case "exit":
-                        SendingMessageHandler.exit();
-                        System.exit(0);
+                    case "reg":
+                        SendingMessageHandler.registerToBS(st.nextToken());
                         break;
-                    case "setport":
-                        changeMyPort(st.nextToken());
+                    case "unreg":
+                        SendingMessageHandler.unregisterFromBS();
                         break;
                     case "table":
                         showRoutingTable();
                         break;
-                    case "reg":
-                        echon("Register command");
-                        SendingMessageHandler.registerToBS(st.nextToken());
-                        break;
-                    case "unreg":
-                        echon("Unregister command");
-                        SendingMessageHandler.unregisterFromBS();
-                        break;
                     case "join":
-                        echon("Joining command");
                         SendingMessageHandler.joinToSystem();
                         break;
                     case "leave":
-                        echon("Leaving command");
                         SendingMessageHandler.leaveTheSystem();
                         break;
                     case "search":
-                        echon("File search command");
-                        SendingMessageHandler.searchFile(st.nextToken());
+                        SendingMessageHandler.searchFile(st);
+                        break;
+
+                    case "regl":
+                        SendingMessageHandler.registerToBSonSameIp();
+                        break;
+                    case "help":
+                        print_ng(helpText());
+                        break;
+                    case "setport":
+                        changeMyPort(st.nextToken());
+                        break;
+                    case "exit":
+                        SendingMessageHandler.exit();
+                        System.exit(0);
+                        break;
+                    default:
+                        print_nng("Not a valid command");
                         break;
                 }
             }catch (NoSuchElementException e){
-                echoni("Wrong command");
+                print_nng("Error in command");
             }
 
         }
@@ -116,7 +139,8 @@ public class Client {
                 socket.receive(incoming);
                 byte[] data = incoming.getData();
                 String msg = new String(data, 0, incoming.getLength());
-                echon("\033[0;32m"+msg+"\033[0m");
+                print_Receiving(msg,incoming);
+
                 StringTokenizer st = new StringTokenizer(msg, " ");
                 String length= st.nextToken();
                 try {
@@ -140,7 +164,7 @@ public class Client {
                             break;
 
                         case "SEROK":
-                            ReceivingMessageHandler.fileSearchResult(st, incoming);
+                            ReceivingMessageHandler.fileSearchOk(st, incoming);
                             break;
 
                         case "JOIN":
@@ -152,12 +176,12 @@ public class Client {
                             break;
 
                         case "SER":
-                            ReceivingMessageHandler.searchFileForNeighbour(st, incoming);
+                            ReceivingMessageHandler.searchFileForNeighbour(st, incoming,msg);
 
 
                     }
                 }catch (NoSuchElementException e){
-                    echon("Wrong message");
+                    print_nng("Wrong message");
                 }
 
             } catch (IOException e) {
