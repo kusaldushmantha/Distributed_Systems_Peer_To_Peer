@@ -12,8 +12,6 @@ public class Client {
     public static String myIp;
     public static String myUserName;
 
-    private static Scanner scanner;
-
     public static DatagramSocket socket;
 
     public static int bs_port=55555;
@@ -23,10 +21,16 @@ public class Client {
 
     public static HashMap<String,Node> routingTable= new HashMap<String,Node>();
 
+    public static ArrayList<String> selectedFiles=new ArrayList<>();
+
+    public static String filepath="./Resources/File Names.txt";
+
     public static boolean okToListen=false;
 
     static Thread listeningThread;
     static Thread cliThread;
+
+    private static Scanner scanner;
 
     public static void main(String[] args) throws SocketException {
 
@@ -72,6 +76,9 @@ public class Client {
 
         print_nn("\nIP address : " + myIp + " \tPort : " +myPort + " \tUsername : " +myUserName, "\033[0;1m");
 
+
+        readAndGetRandomFiles(filepath); // get five files from File Names.txt
+
         cliThread = new Thread(Client:: handleInterfaceInput);
         cliThread.start();
 
@@ -103,12 +110,15 @@ public class Client {
                     case "search":
                         SendingMessageHandler.searchFile(st);
                         break;
+                    case "files":
+                        showSelectedFiles();
+                        break;
 
                     case "regl":
                         SendingMessageHandler.registerToBSonSameIp();
                         break;
                     case "help":
-                        print_ng(helpText());
+                        showHelp();
                         break;
                     case "setport":
                         changeMyPort(st.nextToken());
