@@ -21,6 +21,7 @@ Application commands
 | `join`                           | sending join commands to neighbours |                      |
 | `leave`                          | sending leave commands to neighbours|                      |
 | `table`                          | show routing table                  |                      |
+| `files`                          | show selected files                 |                      |
 | `search file_name hops[optional]`| file search from neighbours, hops to go naighbours of neighbour | `search moon.jpg 3` |
 | `exit`                           | exit from application followed by 'unreg' and 'leave' |    |
 | `help`                           | show application commands           |                      |
