@@ -5,6 +5,7 @@ import java.util.*;
 import java.net.*;
 
 import static com.company.Util.*;
+import static com.company.Printer.*;
 
 public class Client {
 
@@ -18,8 +19,10 @@ public class Client {
     public static String bs_ip;
     public static boolean registered=false;
 
+    public static int gossipThreadStartingDelay=1000; //10s
+    public static int gossipPeriod =10000; //10s
 
-    public static HashMap<String,Node> routingTable= new HashMap<String,Node>();
+    private static HashMap<String,Node> routingTable= new HashMap<String,Node>();
 
     public static ArrayList<String> selectedFiles=new ArrayList<>();
 
@@ -27,10 +30,13 @@ public class Client {
 
     public static boolean okToListen=false;
 
-    static Thread listeningThread;
-    static Thread cliThread;
+    public static Thread listeningThread;
+    private static Thread cliThread;
+    private static Thread gossipThread;
 
     private static Scanner scanner;
+
+    public static Status rgStatus=new Status();
 
     public static void main(String[] args) throws SocketException {
 
@@ -82,6 +88,9 @@ public class Client {
         cliThread = new Thread(Client:: handleInterfaceInput);
         cliThread.start();
 
+        gossipThread=new Thread(Client::sendGossips);
+        gossipThread.start();
+
     }
 
     private static void handleInterfaceInput() {
@@ -99,7 +108,7 @@ public class Client {
                         SendingMessageHandler.unregisterFromBS();
                         break;
                     case "table":
-                        showRoutingTable();
+                        printRoutingTable();
                         break;
                     case "join":
                         SendingMessageHandler.joinToSystem();
@@ -111,14 +120,14 @@ public class Client {
                         SendingMessageHandler.searchFile(st);
                         break;
                     case "files":
-                        showSelectedFiles();
+                        printSelectedFiles();
                         break;
 
                     case "regl":
                         SendingMessageHandler.registerToBSonSameIp();
                         break;
                     case "help":
-                        showHelp();
+                        printHelp(getHelpText());
                         break;
                     case "setport":
                         changeMyPort(st.nextToken());
@@ -187,7 +196,9 @@ public class Client {
 
                         case "SER":
                             ReceivingMessageHandler.searchFileForNeighbour(st, incoming,msg);
-
+                            break;
+                        case "GOSSIP":
+                            ReceivingMessageHandler.handleGossip(st,incoming,msg);
 
                     }
                 }catch (NoSuchElementException e){
@@ -200,5 +211,40 @@ public class Client {
         }
     }
 
+
+
+    public static void sendGossips(){
+
+        Timer timer=new Timer();
+
+        TimerTask task=new TimerTask() {
+            @Override
+            public void run() {
+                SendingMessageHandler.sendGossips();
+            }
+        };
+
+        timer.schedule(task,gossipThreadStartingDelay, gossipPeriod);
+    }
+
+    public static void addToRoutingTable(Node node,String addedBy){
+        if (routingTable.containsKey(node.getKey())){
+            return;
+        }else {
+            routingTable.put(node.getKey(),node);
+            rgStatus.routingTableStatus_plus1();
+            print_ng("Added Neighbour to routing table <- "+node.getKey()+" by "+addedBy);
+        }
+    }
+    public static void removeFromRoutingTable(Node node){
+        if (routingTable.containsKey(node.getKey())){
+            routingTable.remove(node.getKey());
+            print_ng("Removing Neighbour from routing table : "+node.getKey());
+        }
+    }
+
+    public static HashMap<String, Node> getRoutingTable(){
+        return routingTable;
+    }
 
 }
