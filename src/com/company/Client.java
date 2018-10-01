@@ -23,7 +23,7 @@ public class Client {
 
     public static ArrayList<String> selectedFiles=new ArrayList<>();
 
-    public static String filepath="./Resources/File Names.txt";
+    public static String filepath= "Resources/File Names.txt";
 
     public static boolean okToListen=false;
 
