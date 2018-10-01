@@ -18,10 +18,19 @@ import static com.company.Client.*;
 public class Util {
 
 
-    public static String[] searchFile(String filename){
+    public static ArrayList<String> searchFile(String searchName){
 
-        // TODO: 9/20/18 implement file search
-        String[] foundFiles={"dummy1_"+myIp,"dummy2_"+myIp};
+        ArrayList<String> foundFiles=new ArrayList<>();
+
+        for (String fileName:selectedFiles){
+            for (String word:fileName.split(" ")){
+                if (word.equalsIgnoreCase(searchName)){
+                    foundFiles.add(fileName);
+                    break;
+                }
+            }
+        }
+
         return foundFiles;
     }
 
