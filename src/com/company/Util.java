@@ -207,7 +207,7 @@ public class Util {
     }
 
     public static void print_Success(String msg){
-        String msg_=colorText("> ","\033[0;1m")+colorText("Success: ","\033[1;32m")+colorText(msg,"\033[0;90m");
+        String msg_=colorText(" > ","\033[0;1m")+colorText("Success: ","\033[1;32m")+colorText(msg,"\033[0;90m");
         print_n(msg_);
     }
 
