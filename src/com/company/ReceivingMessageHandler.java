@@ -1,12 +1,12 @@
 package com.company;
 
 import java.net.DatagramPacket;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.StringTokenizer;
 import static com.company.Client.*;
 import static com.company.Util.*;
+import static com.company.Printer.*;
 
 public class ReceivingMessageHandler {
 
@@ -25,20 +25,20 @@ public class ReceivingMessageHandler {
                 print_Success("Registered");
                 registered=true;
                 Node neighbour= new Node(st.nextToken(),st.nextToken(),"");
-                routingTable.put(neighbour.getKey(),neighbour);
-                print_nng("Added Neighbour to routing table <- "+neighbour.getKey());
+
+                addToRoutingTable(neighbour,"Bootstrap Server Response");
+                print_n("");
                 break;
 
             case 2:
                 print_Success("Registered");
                 registered=true;
                 Node neighbour1= new Node(st.nextToken(),st.nextToken(),"");
-                routingTable.put(neighbour1.getKey(),neighbour1);
-                print_ng("Added Neighbour 1 to routing table <- "+neighbour1.getKey());
+                addToRoutingTable(neighbour1,"Bootstrap Server Response");
 
                 Node neighbour2= new Node(st.nextToken(),st.nextToken(),"");
-                routingTable.put(neighbour2.getKey(),neighbour2);
-                print_nng("Added Neighbour 2 to routing table <- "+neighbour2.getKey());
+                addToRoutingTable(neighbour2,"Bootstrap Server Response");
+                print_n("");
                 break;
 
             case 9999:
@@ -118,7 +118,7 @@ public class ReceivingMessageHandler {
         String msg_formatted;
 
         Node node=new Node(node_ip,node_port,"");
-        if (routingTable.containsKey(node.getKey())){
+        if (getRoutingTable().containsKey(node.getKey())){
             print_ng("Already added neighbour : "+node.getKey());
 
             msg="JOINOK "+0;
@@ -129,8 +129,7 @@ public class ReceivingMessageHandler {
 
             try {
 
-                routingTable.put(node.getKey(),node);
-                print_ng("Added neighbour to routing table <- "+node.getKey());
+                addToRoutingTable(node,"Join request");
 
             }catch (Exception e){
                 msg="JOINOK "+9999;
@@ -154,22 +153,22 @@ public class ReceivingMessageHandler {
         String msg_formatted;
 
         Node node=new Node(node_ip,node_port,"");
-        if (routingTable.containsKey(node.getKey())){
+        if (getRoutingTable().containsKey(node.getKey())){
             print_ng("Removing neighbour : "+node.getKey());
 
             try {
 
-                routingTable.remove(node.getKey());
+                removeFromRoutingTable(node);
+
+                msg="LEAVEOK "+0;
+                msg_formatted = formatMessage(msg);
+                sendPacket(node.getIp(),node.getPort(),msg_formatted,"Leave Ok");
 
             }catch (Exception e){
                 msg="LEAVEOK "+9999;
                 msg_formatted = formatMessage(msg);
                 sendPacket(node.getIp(),node.getPort(),msg_formatted,"Leave Ok");
             }
-
-            msg="LEAVEOK "+0;
-            msg_formatted = formatMessage(msg);
-            sendPacket(node.getIp(),node.getPort(),msg_formatted,"Leave Ok");
 
         }else {
 
@@ -270,7 +269,7 @@ public class ReceivingMessageHandler {
             String msg_formattedForHops = formatMessage(hopsMsg);
 
             int forwardedHops=0;
-            for (Map.Entry<String, Node> entry : routingTable.entrySet()) {
+            for (Map.Entry<String, Node> entry : getRoutingTable().entrySet()) {
 
                 if (!entry.getValue().isEqual(ip_file_needed,port_file_needed)){
                     sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formattedForHops, "Search in hops");
@@ -280,6 +279,33 @@ public class ReceivingMessageHandler {
             }
             if (forwardedHops==0){
                 print_ng("No other neighbours to forward this search");
+            }
+
+        }
+        print_n("");
+
+    }
+
+    public static void handleGossip(StringTokenizer st, DatagramPacket incoming, String msg) {
+        //length GOSSIP IP Port no_of_neighbours neighbour1_ip neighbour1_port neighbour2_ip neighbour2_port
+
+        String ip_of_sender=st.nextToken();
+        String port_of_sender=st.nextToken();
+        int no_of_nodes_received=Integer.parseInt(st.nextToken());
+
+        Node senderNode=new Node(ip_of_sender,port_of_sender,"");
+
+        if (!getRoutingTable().containsKey(senderNode.getKey())){
+            addToRoutingTable(senderNode,"Gossiping (Gossip sender)");
+        }
+
+        for (int i=0;i<no_of_nodes_received;i++){
+            Node node=new Node(st.nextToken(),st.nextToken(),"");
+
+            if (getRoutingTable().containsKey(node.getKey())){
+                continue;
+            }else {
+                addToRoutingTable(node,"Gossiping");
             }
 
         }

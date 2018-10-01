@@ -1,9 +1,11 @@
 package com.company;
 
+import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import static com.company.Client.*;
+import static com.company.Printer.*;
 import static com.company.Util.*;
 
 public class SendingMessageHandler {
@@ -47,9 +49,9 @@ public class SendingMessageHandler {
 
         /* length UNREG IP_address port_no username */
         String msg="UNREG " + myIp + " " + myPort + " " + myUserName;
-        String msg_formated = formatMessage(msg);
+        String msg_formatted = formatMessage(msg);
 
-        sendPacket(bs_ip,bs_port,msg_formated,"Unregister");
+        sendPacket(bs_ip,bs_port,msg_formatted,"Unregister");
     }
 
     /**
@@ -57,17 +59,17 @@ public class SendingMessageHandler {
      */
     public static void joinToSystem() {
 
-        if (routingTable.size()==0) {
+        if (getRoutingTable().size()==0) {
             print_nng("No neighbours in routing table to join");
             return;
         }
 
         /* length JOIN IP_address port_no */
         String msg="JOIN " + myIp + " " + myPort;
-        String msg_formated = formatMessage(msg);
+        String msg_formatted = formatMessage(msg);
 
-        for (Entry<String, Node> entry : routingTable.entrySet()) {
-            sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formated,"Join");
+        for (Entry<String, Node> entry : getRoutingTable().entrySet()) {
+            sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formatted,"Join");
         }
 
     }
@@ -78,17 +80,17 @@ public class SendingMessageHandler {
      */
     public static void leaveTheSystem() {
 
-        if (routingTable.size()==0) {
+        if (getRoutingTable().size()==0) {
             print_nng("No neighbours in routing table to leave");
             return;
         }
 
         /* length LEAVE IP_address port_no */
         String msg="LEAVE " + myIp + " " + myPort;
-        String msg_formated = formatMessage(msg);
+        String msg_formatted = formatMessage(msg);
 
-        for (Entry<String,Node> entry: routingTable.entrySet()) {
-            sendPacket(entry.getValue().getIp(),entry.getValue().getPort(),msg_formated,"Leave");
+        for (Entry<String,Node> entry: getRoutingTable().entrySet()) {
+            sendPacket(entry.getValue().getIp(),entry.getValue().getPort(),msg_formatted,"Leave");
         }
 
     }
@@ -100,8 +102,12 @@ public class SendingMessageHandler {
      * @param st
      */
     public static void searchFile(StringTokenizer st) {
-
-        if (routingTable.isEmpty()){
+//
+//        length SER IP Port file_name hops search_key
+//
+//        search key = timestamp + ”_” + ip:port
+//
+        if (getRoutingTable().isEmpty()){
             print_nng("No neighbours in routing table to search");
             return;
         }
@@ -118,10 +124,10 @@ public class SendingMessageHandler {
             }
             /* length SER IP port file_name hops */
             String msg = "SER " + myIp + " " + myPort + " " + filename + " " + hops;
-            String msg_formated = formatMessage(msg);
+            String msg_formatted = formatMessage(msg);
 
-            for (Entry<String, Node> entry : routingTable.entrySet()) {
-                sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formated, "Search");
+            for (Entry<String, Node> entry : getRoutingTable().entrySet()) {
+                sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formatted, "Search");
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -140,6 +146,44 @@ public class SendingMessageHandler {
 
     }
 
+
+    public static void sendGossips() {
+        if (getRoutingTable().size() > 1) {
+            if (rgStatus.hasRoutingTableIncreasedComparedToGossipStatus()) { //gossip only if routing table has added some nodes
+
+                rgStatus.setGossipSendingStatusToRoutingTableStatus();
+
+                ArrayList<Node> allNeighbours = new ArrayList<>();
+                allNeighbours.addAll(getRoutingTable().values());
+
+
+                for (Node node : allNeighbours) {
+                    String neighboursToBeSent = "";
+                    int count = 0;
+                    for (Node n : allNeighbours) {
+                        if (!node.isEqual(n.getIp(), n.getPort())) {
+                            neighboursToBeSent += n.getIp() + " " + n.getPort() + " ";
+                            count++;
+                        } else {
+                            continue;
+                        }
+                    }
+                    neighboursToBeSent.substring(0, neighboursToBeSent.length() - 1); //remove last space
+
+                    sendNeighboursToNeighbourMessage(node, count, neighboursToBeSent);
+
+                }
+                print_n("");
+            }
+        }
+    }
+
+
+    private static void sendNeighboursToNeighbourMessage(Node nodeToBeSent, int neighbourCount,String neighboursDetails){
+        String msg="GOSSIP "+myIp+" "+myPort+" "+neighbourCount+" "+neighboursDetails;
+        String msg_formatted=formatMessage(msg);
+        sendPacket(nodeToBeSent.getIp(),nodeToBeSent.getPort(),msg_formatted,"Gossip");
+    }
 
 
 }
