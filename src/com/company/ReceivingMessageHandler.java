@@ -1,6 +1,8 @@
 package com.company;
 
 import java.net.DatagramPacket;
+import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.StringTokenizer;
 import static com.company.Client.*;
@@ -186,7 +188,7 @@ public class ReceivingMessageHandler {
     // TODO: 9/21/18 temp search result to collect until hops ==1
     // TODO: 9/21/18 map to save final result of a search
 
-    public static void fileSearchOk(StringTokenizer st, DatagramPacket incoming) {
+    public static void fileSearchOk(StringTokenizer st, String msg, DatagramPacket incoming) {
 
         int no_of_files= Integer.parseInt(st.nextToken());
         String ip_file_owner=st.nextToken();
@@ -206,21 +208,28 @@ public class ReceivingMessageHandler {
                 break;
             default:
                 if (no_of_files>0) {
-                    print_Success("Searching");
-                    String[] filenames = new String[no_of_files];
-                    try {
-                        for (int i = 0; i < no_of_files; i++) {
-                            filenames[i] = st.nextToken();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    print_Success("File Search");
+
+
+                    ArrayList<String> fileNames=new ArrayList<>();
+
+
+                    for (String s: msg.split("'")){
+                        fileNames.add(s);
                     }
+
+
+                    //to have only file names
+                    fileNames.remove(0); //remove first part of the msg
+                    fileNames.remove(fileNames.size()-1); //remove last null item
 
                     String filesStr = "";
 
-                    for (String file : filenames) {
+                    for (String file : fileNames) {
                         filesStr += file + ", ";
                     }
+                    filesStr=filesStr.substring(0, filesStr.length() - 2); //remove last , and space
+
                     print_nng("Neighbour " + ip_file_owner + ":" + port_file_owner + " has : " + filesStr);
 
                     //collect data until hops==1
@@ -235,18 +244,18 @@ public class ReceivingMessageHandler {
 
         String ip_file_needed=st.nextToken();
         int port_file_needed= Integer.parseInt(st.nextToken());
-        String fileName=st.nextToken();
+        String searchName=st.nextToken();
         int hops= Integer.parseInt(st.nextToken());
 
         //searching files locally
-        String[] foundFiles = searchFile(fileName);
+        ArrayList<String> foundFiles = searchFile(searchName);
         String filesStr="";
 
         for (String file: foundFiles){
-            filesStr+=file+ " ";
+            filesStr+="'"+file+ "' ";
         }
 
-        String msg="SEROK "+ foundFiles.length + " " + myIp + " " + myPort +" " + hops + " " + filesStr ;
+        String msg="SEROK "+ foundFiles.size() + " " + myIp + " " + myPort +" " + hops + " " + filesStr ;
         String msg_formatted = formatMessage(msg);
         sendPacket(ip_file_needed,port_file_needed,msg_formatted, "Search Ok");
 
@@ -257,7 +266,7 @@ public class ReceivingMessageHandler {
          */
         if (hops>1){
             hops=hops-1;
-            String hopsMsg="SER " + ip_file_needed + " " + port_file_needed + " " + fileName + " " + hops;
+            String hopsMsg="SER " + ip_file_needed + " " + port_file_needed + " " + searchName + " " + hops;
             String msg_formattedForHops = formatMessage(hopsMsg);
 
             int forwardedHops=0;

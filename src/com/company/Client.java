@@ -174,7 +174,7 @@ public class Client {
                             break;
 
                         case "SEROK":
-                            ReceivingMessageHandler.fileSearchOk(st, incoming);
+                            ReceivingMessageHandler.fileSearchOk(st,msg, incoming);
                             break;
 
                         case "JOIN":
