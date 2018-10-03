@@ -45,6 +45,7 @@ public class Client{
             InetAddress inetAddress = InetAddress.getByName("localhost");
             this.packet = new DatagramPacket(bytesToSend, bytesToSend.length, inetAddress, 55555);
             this.clientSocket.send(this.packet);
+
             while (!this.responseHandler.isValueSet){}
             this.responseHandler.isValueSet = false;
             return this.responseHandler.response;
@@ -117,9 +118,7 @@ public class Client{
         this.responseHandler.response = "";
         String joinString = "JOIN " + ipAddress + " " + port + " " + this.username;
         joinString = formatString(joinString);
-        //System.out.println("Join Command: " + joinString);
         String joinResponse = nodeCommand(joinString);
-        //System.out.println("JoinToNode: " + joinResponse);
         if(joinResponse.split(" ")[2].trim().equals("0")) {
             System.out.println("Join Network Successful");
             this.responseHandler.isValueSet = false;

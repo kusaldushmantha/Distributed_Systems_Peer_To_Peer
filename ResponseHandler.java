@@ -50,14 +50,19 @@ public class ResponseHandler implements Runnable {
                 System.out.println("Routing Table Size : " + Integer.toString(this.routingTable.size()));
                 System.out.println(this.routingTable);
                 System.out.println();
+                isValueSet = true;
+
             }else if(command.equals("JOINOK")){
                 String requesterIp = packet.getAddress().toString();
                 int requesterPort = packet.getPort();
                 String username = requestOnNode[3].trim();
                 String ipAndPort = requesterIp + " " + requesterPort;
-                int status = addToRoutingTable(username, ipAndPort);
+                addToRoutingTable(username, ipAndPort);
                 System.out.println("Routing Table Size : " + Integer.toString(this.routingTable.size()));
                 System.out.println(this.routingTable);
+                System.out.println();
+                isValueSet = true;
+
             }else{
                 isValueSet = true;
                 while (isValueSet){ }
