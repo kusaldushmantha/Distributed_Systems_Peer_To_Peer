@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 public class Client{
 
+    private String clientID;
     private String ipAddress;
     private String port;
     private String username;
@@ -18,7 +19,7 @@ public class Client{
     private DatagramPacket packet;
     private ResponseHandler responseHandler;
     private Thread responseHandlerThread;
-    public volatile Map<Integer, Map<String, Integer>> routingTable;
+    public volatile Map<String, String> routingTable;
 
     private Client(String ipAddress,
                    String port,
@@ -28,9 +29,9 @@ public class Client{
         this.username = username;
         this.responseFromServer = new byte[1024];
         try {
-            routingTable = new HashMap<Integer, Map<String, Integer>>();
+            routingTable = new HashMap<>();
             this.clientSocket = new DatagramSocket(Integer.parseInt(this.port));
-            responseHandler = new ResponseHandler(this.clientSocket, routingTable);
+            responseHandler = new ResponseHandler(this.clientSocket, routingTable, this.username);
             responseHandlerThread = new Thread(responseHandler);
             responseHandlerThread.start();
         } catch (SocketException e) {
@@ -96,7 +97,6 @@ public class Client{
                     String nodeIpaddress = serverResponse[3+i].trim();
                     String nodePort = serverResponse[4+i].trim();
                     joinToNode(nodeIpaddress, nodePort);
-                    break;
                 }
             }
         }
@@ -115,7 +115,7 @@ public class Client{
 
     private void joinToNode(String ipAddress, String port){
         this.responseHandler.response = "";
-        String joinString = "JOIN " + ipAddress + " " + port;
+        String joinString = "JOIN " + ipAddress + " " + port + " " + this.username;
         joinString = formatString(joinString);
         //System.out.println("Join Command: " + joinString);
         String joinResponse = nodeCommand(joinString);

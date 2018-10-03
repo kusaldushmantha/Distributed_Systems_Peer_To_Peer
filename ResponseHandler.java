@@ -10,14 +10,17 @@ public class ResponseHandler implements Runnable {
 
     public volatile String response;
     public volatile boolean isValueSet = false;
-    public volatile Map<Integer, Map<String, Integer>> routingTable;
+    public volatile Map<String, String> routingTable;
 
     DatagramSocket socket;
+    String username;
 
     ResponseHandler(DatagramSocket socket,
-                    Map<Integer, Map<String, Integer>> routingTable){
+                    Map<String, String> routingTable,
+                    String username){
         this.socket = socket;
         this.routingTable = routingTable;
+        this.username = username;
     }
 
     @Override
@@ -33,9 +36,28 @@ public class ResponseHandler implements Runnable {
             }
             this.response = new String(packet.getData());
             System.out.println("Response handler: " + this.response);
-            String command = this.response.split(" ")[1].trim();
+            System.out.println();
+            String[] requestOnNode = this.response.split(" ");
+            String command = requestOnNode[1].trim();
+
             if(command.equals("JOIN")){
-                sendJoinStatus(packet, 0);
+                String requesterIp = packet.getAddress().toString();
+                int requesterPort = packet.getPort();
+                String username = requestOnNode[4].trim();
+                String ipAndPort = requesterIp + " " + requesterPort;
+                int status = addToRoutingTable(username, ipAndPort);
+                sendJoinStatus(packet, status);
+                System.out.println("Routing Table Size : " + Integer.toString(this.routingTable.size()));
+                System.out.println(this.routingTable);
+                System.out.println();
+            }else if(command.equals("JOINOK")){
+                String requesterIp = packet.getAddress().toString();
+                int requesterPort = packet.getPort();
+                String username = requestOnNode[3].trim();
+                String ipAndPort = requesterIp + " " + requesterPort;
+                int status = addToRoutingTable(username, ipAndPort);
+                System.out.println("Routing Table Size : " + Integer.toString(this.routingTable.size()));
+                System.out.println(this.routingTable);
             }else{
                 isValueSet = true;
                 while (isValueSet){ }
@@ -43,14 +65,24 @@ public class ResponseHandler implements Runnable {
         }
     }
 
+    private int addToRoutingTable(String nodeID, String ipAndPort) {
+        this.routingTable.put(nodeID , ipAndPort);
+        return 0;
+    }
+
+    private int removeFromRoutingTable(String nodeID){
+        this.routingTable.remove(nodeID);
+        return 0;
+    }
+
     private void sendJoinStatus(DatagramPacket packet, int status){
         String joinResponse = "";
         InetAddress senderAddress = packet.getAddress();
         int senderPort = packet.getPort();
         if(status == 0){
-            joinResponse = "JOINOK " + Integer.toString(status);
+            joinResponse = "JOINOK " + Integer.toString(status)+" "+this.username;
         }else{
-            joinResponse = "JOINOK 9999";
+            joinResponse = "JOINOK 9999 " + this.username;
         }
         byte[] joinStatus = formatString(joinResponse).getBytes();
         DatagramPacket sendPacket = new DatagramPacket(joinStatus, joinStatus.length, senderAddress, senderPort);
