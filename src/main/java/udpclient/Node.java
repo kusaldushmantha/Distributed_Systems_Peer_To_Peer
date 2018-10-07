@@ -1,6 +1,4 @@
-package com.company;
-
-import java.util.StringTokenizer;
+package udpclient;
 
 public class Node {
 

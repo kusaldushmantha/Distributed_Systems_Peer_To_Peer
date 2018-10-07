@@ -1,16 +1,23 @@
-package com.company;
+package udpclient;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import static com.company.Client.*;
-import static com.company.Printer.*;
+
+import static com.sun.javafx.scene.control.skin.Utils.getResource;
+import static udpclient.Client.*;
+import static udpclient.Printer.*;
 
 
 public class Util {
@@ -83,23 +90,23 @@ public class Util {
 
 
     public static void readAndGetRandomFiles(String filepath) {
-        ArrayList<String> nameList=new ArrayList<>();
-        try (Stream<String> lines = Files.lines(Paths.get(filepath), StandardCharsets.UTF_8)) {
-            lines.forEachOrdered(line -> nameList.add(line));
 
-            Collections.shuffle(nameList);
+        InputStream inputStream = Util.class.getClassLoader().getResourceAsStream(filepath);
 
-            Random random = new Random();
-            int range=random.nextInt((5 - 3) + 1) + 3;
-            for (int i=0; i<range; i++) {
-                selectedFiles.add(nameList.get(i));
-            }
+        List<String> nameList =
+                new BufferedReader(new InputStreamReader(inputStream,
+                        StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
 
-            printSelectedFiles();
+        Collections.shuffle(nameList);
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        Random random = new Random();
+        int range=random.nextInt((5 - 3) + 1) + 3;
+        for (int i=0; i<range; i++) {
+            selectedFiles.add(nameList.get(i));
         }
+
+        printSelectedFiles();
+
     }
 
 
@@ -118,10 +125,10 @@ public class Util {
         sb.append("\t").append("leave").append("\t\t\t\t\t - ").append("leave from neighbours").append("\n");
         sb.append("\t").append("table").append("\t\t\t\t\t - ").append("show routing table").append("\n");
         sb.append("\t").append("files").append("\t\t\t\t\t - ").append("show selected files").append("\n");
-        sb.append("\t").append("search file_name hops[optional]").append("\t\t - ").append("search files in network by name").append("\n");
-        sb.append("\t").append("exit").append("\t\t\t\t\t - ").append("exit from application followed by 'unreg' and 'leave' ").append("\n");
+        sb.append("\t").append("search file_name hops(optional)").append("\t\t - ").append("search files in network by name").append("\n");
+        sb.append("\t").append("appexit").append("\t\t\t\t\t - ").append("exit from application followed by 'unreg' and 'leave' ").append("\n");
         sb.append("\t  ____\n\n");
-        sb.append("\t").append("help").append("\t\t - ").append("app commands (this)").append("\n");
+        sb.append("\t").append("apphelp").append("\t\t - ").append("app commands (this)").append("\n");
         sb.append("\t").append("setport port").append("\t - ").append("change port if registration failed").append("\n");
         return sb.toString();
     }

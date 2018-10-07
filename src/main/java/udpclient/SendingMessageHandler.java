@@ -1,12 +1,12 @@
-package com.company;
+package udpclient;
 
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
-import static com.company.Client.*;
-import static com.company.Printer.*;
-import static com.company.Util.*;
+import static udpclient.Client.*;
+import static udpclient.Printer.*;
+import static udpclient.Util.*;
 
 public class SendingMessageHandler {
 
@@ -122,15 +122,25 @@ public class SendingMessageHandler {
                     print_nng("Wrong hops value");
                 }
             }
-            /* length SER IP port file_name hops */
-            String msg = "SER " + myIp + " " + myPort + " " + filename + " " + hops;
-            String msg_formatted = formatMessage(msg);
-
-            for (Entry<String, Node> entry : getRoutingTable().entrySet()) {
-                sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formatted, "Search");
-            }
+            searchFile(filename,hops);
         }catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    /**
+     *  command: search
+     *
+     * @param filename
+     * @param hops
+     */
+    public static void searchFile(String filename,int hops){
+        /* length SER IP port file_name hops */
+        String msg = "SER " + myIp + " " + myPort + " " + filename + " " + hops;
+        String msg_formatted = formatMessage(msg);
+
+        for (Entry<String, Node> entry : getRoutingTable().entrySet()) {
+            sendPacket(entry.getValue().getIp(), entry.getValue().getPort(), msg_formatted, "Search");
         }
     }
 

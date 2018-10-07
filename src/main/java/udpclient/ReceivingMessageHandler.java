@@ -1,12 +1,13 @@
-package com.company;
+package udpclient;
 
 import java.net.DatagramPacket;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.StringTokenizer;
-import static com.company.Client.*;
-import static com.company.Util.*;
-import static com.company.Printer.*;
+
+import static udpclient.Client.*;
+import static udpclient.Printer.*;
+import static udpclient.Util.*;
 
 public class ReceivingMessageHandler {
 

@@ -1,4 +1,4 @@
-package com.company;
+package udpclient;
 
 public class Status {
     private int routingTableStatus=0;
