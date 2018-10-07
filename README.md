@@ -14,7 +14,7 @@ otherwise use
 java -jar target/dsapp-1.jar  
 ```
 
-Application commands
+<b>Application commands</b>
 
 | Command                          | Description                         | Example              |
 | -------------------------------- |-------------------------------------|----------------------|
