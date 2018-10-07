@@ -1,11 +1,14 @@
-package com.company;
+package udpclient;
 
 import java.io.IOException;
+import java.net.BindException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.*;
-import java.net.*;
 
-import static com.company.Util.*;
-import static com.company.Printer.*;
+import static udpclient.Printer.*;
+import static udpclient.Util.*;
 
 public class Client {
 
@@ -38,7 +41,7 @@ public class Client {
 
     public static Status rgStatus=new Status();
 
-    public static void main(String[] args) throws SocketException {
+    public static void main(String[] args)  {
 
         scanner =new Scanner(System.in);
         myIp=getMyIp();
@@ -55,6 +58,8 @@ public class Client {
                 }catch (BindException e){
                     print_ng("Permission denied. Use a different port");
                     myPort++;
+                } catch (SocketException e) {
+                    e.printStackTrace();
                 }
             }else {
                 try {
@@ -65,6 +70,8 @@ public class Client {
                     print_ng("Permission denied. Use a different port");
                 }catch (NumberFormatException e){
                     print_ng("Wrong input for port");
+                } catch (SocketException e) {
+                    e.printStackTrace();
                 }
             }
         }

@@ -1,9 +1,9 @@
-package com.company;
+package udpclient;
 
 import java.net.DatagramPacket;
 import java.util.Map;
 
-import static com.company.Client.*;
+import static udpclient.Client.*;
 
 public class Printer {
 
