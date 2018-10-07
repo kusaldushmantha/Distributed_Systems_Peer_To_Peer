@@ -1,14 +1,15 @@
 # distributed-client
 
-To create the jar, from project root 
+<b>To create the jar, from project root</b> 
 
 If you have installed maven use  
   ```mvn clean install```    
+
 otherwise use  
   ```./mvnw clean install``` on unix based os  
   ```./mvnw.cmd clean install``` on windows  
 
-To run  
+<b>To run</b>  
 ```
 java -jar target/dsapp-1.jar  
 ```

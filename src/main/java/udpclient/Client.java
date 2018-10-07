@@ -53,7 +53,7 @@ public class Client {
         scanner =new Scanner(System.in);
         myIp=getMyIp();
 
-        printName("Distributed System Client Application");
+        //printName("Distributed System Client Application");
 
         while (true) {
             print("\nEnter port \t[" + myPort + "]\t: ");

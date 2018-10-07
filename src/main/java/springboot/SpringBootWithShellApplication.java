@@ -32,7 +32,7 @@ public class SpringBootWithShellApplication {
 
         Client.initiateClient(false);
 
-        System.out.println("Wait for starting REST...");
+        System.out.print("Wait for starting REST...\t");
         sw.start();
         ctx = SpringApplication.run(SpringBootWithShellApplication.class);
         System.out.println("REST started...");

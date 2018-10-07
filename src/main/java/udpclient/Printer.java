@@ -52,9 +52,9 @@ public class Printer {
     }
 
     public static void printName(String name) {
-        print_n("\n---------------------------------------","\033[1;36m");
+        print_n("\n");
         print_n(" "+name,boldBlue);
-        print_nn("_______________________________________","\033[1;36m");
+        print_n("");
     }
 
     public static void print_Receiving(String msg, DatagramPacket incoming) {

@@ -12,14 +12,18 @@ public class AppBannerProvider extends DefaultBannerProvider {
 
     public String getBanner() {
         StringBuffer buf = new StringBuffer();
+        buf.append("\n");
+        buf.append("\033[1;34m");
         buf.append("=======================================")
                 .append(OsUtils.LINE_SEPARATOR);
         buf.append("*       Distributed Client Cli        *")
                 .append(OsUtils.LINE_SEPARATOR);
         buf.append("=======================================")
                 .append(OsUtils.LINE_SEPARATOR);
-        buf.append("Version:")
-                .append(this.getVersion());
+//        buf.append("Version:")
+//                .append(this.getVersion());
+
+        buf.append("\033[1;34m");
         return buf.toString();
     }
 
