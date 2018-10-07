@@ -1,14 +1,16 @@
 # distributed-client
 
-Compile the application, From project root 
-```
-cd src
-javac -cp . com/company/Client.java
-```
+To create the jar, from project root 
 
-Then run
+If you have installed maven use  
+  ```mvn clean install```    
+otherwise use  
+  ```./mvnw clean install``` on unix based os  
+  ```./mvnw.cmd clean install``` on windows  
+
+To run  
 ```
-java com.company.Client
+java -jar target/dsapp-1.jar  
 ```
 
 Application commands
@@ -23,6 +25,6 @@ Application commands
 | `table`                          | show routing table                  |                      |
 | `files`                          | show selected files                 |                      |
 | `search file_name hops[optional]`| file search from neighbours, hops to go naighbours of neighbour | `search moon.jpg 3` |
-| `exit`                           | exit from application followed by 'unreg' and 'leave' |    |
-| `help`                           | show application commands           |                      |
+| `appexit`                        | exit from application followed by 'unreg' and 'leave' |    |
+| `apphelp`                        | show application commands           |                      |
 | `setport port`                   | hange port if registration failed   | `setport 5656`       |
