@@ -29,7 +29,7 @@ public class Client {
 
     public static ArrayList<String> selectedFiles=new ArrayList<>();
 
-    public static String filepath= "Resources/File Names.txt";
+    public static String filepath= "File Names.txt";
 
     public static boolean okToListen=false;
 
@@ -41,8 +41,15 @@ public class Client {
 
     public static Status rgStatus=new Status();
 
+
     public static void main(String[] args)  {
 
+        initiateClient(true);
+
+    }
+
+
+    public static void initiateClient(boolean withScannerInput){
         scanner =new Scanner(System.in);
         myIp=getMyIp();
 
@@ -92,12 +99,13 @@ public class Client {
 
         readAndGetRandomFiles(filepath); // get five files from File Names.txt
 
-        cliThread = new Thread(Client:: handleInterfaceInput);
-        cliThread.start();
+        if(withScannerInput){
+            cliThread = new Thread(Client:: handleInterfaceInput);
+            cliThread.start();
+        }
 
         gossipThread=new Thread(Client::sendGossips);
         gossipThread.start();
-
     }
 
     private static void handleInterfaceInput() {

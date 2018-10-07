@@ -4,13 +4,23 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.shell.CommandLine;
 import org.springframework.shell.SimpleShellCommandLineOptions;
 import org.springframework.shell.core.ExitShellRequest;
 import org.springframework.shell.core.JLineShellComponent;
 import org.springframework.util.StopWatch;
+import udpclient.Client;
 
 @SpringBootApplication
+@ComponentScan(
+        basePackages={"org.springframework.shell"
+                , "org.springframework.shell.converters"
+                , "springshell"
+                , "springboot"
+                , "springboot.rest"
+                , "udpclient"
+        })
 public class SpringBootWithShellApplication {
 
     private static ApplicationContext ctx;
@@ -19,8 +29,14 @@ public class SpringBootWithShellApplication {
 
     public static void main(String[] args) throws Exception{
         System.out.println("Starting application...");
+
+        Client.initiateClient(false);
+
+        System.out.println("Wait for starting REST...");
         sw.start();
         ctx = SpringApplication.run(SpringBootWithShellApplication.class);
+        System.out.println("REST started...");
+
         SpringBootWithShellApplication application = new SpringBootWithShellApplication();
         application.runShell(args);
     }
