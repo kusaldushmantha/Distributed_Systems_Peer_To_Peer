@@ -1,4 +1,4 @@
-package com.company;
+package Distributed_Systems_Peer_To_Peer;
 
 public class Main {
 

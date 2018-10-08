@@ -1,10 +1,14 @@
-package com.company;
+package Distributed_Systems_Peer_To_Peer;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class ResponseHandler implements Runnable {
 
@@ -14,19 +18,19 @@ public class ResponseHandler implements Runnable {
 
     DatagramSocket socket;
     String username;
-
+    List<String> fileList;
     ResponseHandler(DatagramSocket socket,
                     Map<String, String> routingTable,
-                    String username){
+                    String username , List<String> fileList){
         this.socket = socket;
         this.routingTable = routingTable;
         this.username = username;
+        this.fileList = fileList;
     }
-
     @Override
     public void run() {
-        while (true) {
-            isValueSet = false;
+        while (true) { 
+            //this.isValueSet = false;
             byte[] responseFromServer = new byte[1024];
             DatagramPacket packet = new DatagramPacket(responseFromServer, responseFromServer.length);
             try {
@@ -50,7 +54,7 @@ public class ResponseHandler implements Runnable {
                 System.out.println("Routing Table Size : " + Integer.toString(this.routingTable.size()));
                 System.out.println(this.routingTable);
                 System.out.println();
-                isValueSet = true;
+                this.isValueSet = true;
 
             }else if(command.equals("JOINOK")){
                 String requesterIp = packet.getAddress().toString();
@@ -61,11 +65,28 @@ public class ResponseHandler implements Runnable {
                 System.out.println("Routing Table Size : " + Integer.toString(this.routingTable.size()));
                 System.out.println(this.routingTable);
                 System.out.println();
-                isValueSet = true;
+                this.isValueSet = true;
 
-            }else{
-                isValueSet = true;
-                while (isValueSet){ }
+            }else if(command.equals("SER")){
+                String result = searchForFile(requestOnNode[4].trim());
+                if(!result.equals("")){
+                    String ipaddress = requestOnNode[2].trim();
+                    String port = requestOnNode[3].trim();
+                    sendSearchStatus(ipaddress,Integer.parseInt(port),result,0);
+                }else{
+                    Random random = new Random();
+                    List<String> keys = new ArrayList<String>(this.routingTable.keySet());
+                    String randomKey = keys.get( random.nextInt(keys.size()) );
+                    String value = this.routingTable.get(randomKey);
+                    sendMSG(new String(packet.getData()),value.split(" ")[0].substring(1).trim(),value.split(" ")[1].trim());
+                }
+            }else if(command.equals("SEROK")){
+                this.isValueSet = true;
+                System.out.println("Client Command: ");
+            }
+            else{
+                this.isValueSet = true;
+                while (this.isValueSet){ }
             }
         }
     }
@@ -81,6 +102,7 @@ public class ResponseHandler implements Runnable {
     }
 
     private void sendJoinStatus(DatagramPacket packet, int status){
+        System.out.println("send join status");
         String joinResponse = "";
         InetAddress senderAddress = packet.getAddress();
         int senderPort = packet.getPort();
@@ -100,7 +122,59 @@ public class ResponseHandler implements Runnable {
             System.out.println("Client Command: ");
         }
     }
-
+    
+    private void sendSearchStatus(String ipaddress, int senderPort, String results, int status){
+        System.out.println("send serach status");
+        String joinResponse = "";
+        try {
+        if(status == 0){
+            joinResponse = "SEROK " +InetAddress.getLocalHost()+" "+this.socket.getLocalPort()+" "+results;
+        }else{
+            joinResponse = "SEROK 9999 " + this.username;
+        }
+            InetAddress senderAddress = InetAddress.getByName("localhost");
+            byte[] joinStatus = formatString(joinResponse).getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(joinStatus, joinStatus.length, senderAddress, senderPort);
+            this.socket.send(sendPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            this.isValueSet = false;
+            System.out.println("Client Command: ");
+        }
+    }
+    private void sendMSG(String nodeCmd,String nodeIP, String nodePort){
+        try{
+            
+            String toConnectNodeIP = nodeIP;
+            int toConnectNodePort = Integer.parseInt(nodePort);
+            System.out.println(nodeCmd+" "+nodeIP+" "+nodePort);
+            byte[] bytesToSend = nodeCmd.getBytes();
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            DatagramPacket packet = new DatagramPacket(bytesToSend, bytesToSend.length, inetAddress, toConnectNodePort);
+            this.socket.send(packet);
+        }catch (Exception e){
+            System.out.println(e);
+        }finally {
+            this.isValueSet = false;
+            System.out.println("Client Command: ");
+        }
+    }
+    private String searchForFile(String file){
+        String result = "";
+        for(int r =0; r<this.fileList.size();r++){
+            if(this.fileList.get(r).length()>=file.length()){
+                for(int x=0;x<this.fileList.get(r).length()-file.length();x++){
+                    if(file.equals(this.fileList.get(r).subSequence(x, x+file.length()))){
+                        result+=this.fileList.get(r) + " ";
+                    }
+                }
+            }else{
+                continue;
+            }
+        }
+        return result;
+    }
     private String formatString(String currentString){
         int charactersInCurrentString = Integer.toString(currentString.length()).length();
         if(charactersInCurrentString < 4){

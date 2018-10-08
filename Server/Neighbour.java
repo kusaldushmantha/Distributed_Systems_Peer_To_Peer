@@ -1,3 +1,5 @@
+package Distributed_Systems_Peer_To_Peer.Server;
+
 class Neighbour{
 	private String ip;
 	private int port;

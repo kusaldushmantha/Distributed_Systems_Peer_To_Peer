@@ -1,12 +1,17 @@
-package com.company;
+package Distributed_Systems_Peer_To_Peer;
 
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Client{
 
@@ -20,6 +25,7 @@ public class Client{
     private ResponseHandler responseHandler;
     private Thread responseHandlerThread;
     public volatile Map<String, String> routingTable;
+    private List<String> fileList = new ArrayList<>();
 
     private Client(String ipAddress,
                    String port,
@@ -28,10 +34,13 @@ public class Client{
         this.port = port;
         this.username = username;
         this.responseFromServer = new byte[1024];
+        genarateFileList();
+        
         try {
             routingTable = new HashMap<>();
+            
             this.clientSocket = new DatagramSocket(Integer.parseInt(this.port));
-            responseHandler = new ResponseHandler(this.clientSocket, routingTable, this.username);
+            responseHandler = new ResponseHandler(this.clientSocket, routingTable, this.username, this.fileList);
             responseHandlerThread = new Thread(responseHandler);
             responseHandlerThread.start();
         } catch (SocketException e) {
@@ -64,8 +73,9 @@ public class Client{
             InetAddress inetAddress = InetAddress.getLocalHost();
             DatagramPacket packet = new DatagramPacket(bytesToSend, bytesToSend.length, inetAddress, toConnectNodePort);
             this.clientSocket.send(packet);
-
+            System.out.println("node command");
             while (!this.responseHandler.isValueSet){}
+            System.out.println("node command next");
             this.responseHandler.isValueSet = false;
             return this.responseHandler.response;
         }catch (Exception e){
@@ -127,6 +137,14 @@ public class Client{
             this.responseHandler.isValueSet = false;
         }
     }
+    private void sendMSG(String msg){
+
+        String joinString = "SER " + this.ipAddress + " " + this.port + " " + msg;
+        joinString = formatString(joinString);
+        String joinResponse = nodeCommand(joinString);
+//        String regCmd = "SER " + this.ipAddress + " " + this.port + " " + ipAddress+" "+port;
+//        String serverResponseStatus = nodeCommand(formatString(regCmd));
+    }
 
 
     private String formatString(String currentString){
@@ -143,7 +161,14 @@ public class Client{
             return Integer.toString(currentString.length()+5) + " " +currentString;
         }
     }
-
+    private void genarateFileList(){
+        for(int x=0 ; x<3; x++){
+           this.fileList.add(this.username+x);
+        }
+    }
+    private void printRoutingTable(){
+        System.out.println(this.routingTable);
+    }
     public static void main(String[] args){
 
         Scanner scanner = new Scanner(System.in);
@@ -164,10 +189,16 @@ public class Client{
 
             if(clientCmd.equals("REG")){
                 client.registerOnServer();
+                System.out.println("File set : "+client.fileList);
             }else if(clientCmd.equals("UNREG")){
                 client.unregisterFromServer();
+            }else if(clientCmd.equals("MSG")){
+                System.out.print("Type your message : ");
+                String message = scanner.next();
+                client.sendMSG(message);
             }
         }
     }
+    
 
 }
