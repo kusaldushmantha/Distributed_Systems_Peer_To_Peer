@@ -128,7 +128,7 @@ public class ResponseHandler implements Runnable {
         String joinResponse = "";
         try {
         if(status == 0){
-            joinResponse = "SEROK " +InetAddress.getLocalHost()+" "+this.socket.getLocalPort()+" "+results;
+            joinResponse = "SEROK " +InetAddress.getLocalHost().getHostAddress()+" "+this.socket.getLocalPort()+" "+results;
         }else{
             joinResponse = "SEROK 9999 " + this.username;
         }
