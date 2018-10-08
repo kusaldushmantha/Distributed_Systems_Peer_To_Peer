@@ -56,7 +56,7 @@ public class Client {
         //printName("Distributed System Client Application");
 
         while (true) {
-            print("\n\tEnter UDP port\t\t[" + myPort + "]\t: ");
+            print("\n\t\tEnter UDP port\t\t[" + myPort + "]\t: ");
             String inPort=scanner.nextLine();
             if (inPort.equals("")) {
                 try {
@@ -85,7 +85,7 @@ public class Client {
 
         myUserName=getMyHostname();
 
-        print("\tEnter username \t\t["+myUserName+"]\t: ");
+        print("\t\tEnter username \t\t["+myUserName+"]\t: ");
         String inName=scanner.nextLine();
         if (!inName.equals("")) {
             myUserName=inName;

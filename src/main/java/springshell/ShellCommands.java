@@ -65,7 +65,7 @@ public class ShellCommands implements CommandMarker {
         changeMyPort(port);
     }
 
-    @CliCommand(value = {"quit"}, help = "exit from application followed by 'unreg' and 'leave' ")
+    @CliCommand(value = {"appexit"}, help = "exit from application followed by 'unreg' and 'leave' ")
     public void quit(){
         SendingMessageHandler.exit();
         System.exit(0);

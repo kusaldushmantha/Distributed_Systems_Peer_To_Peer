@@ -19,8 +19,8 @@ public class AppBannerProvider extends DefaultBannerProvider {
     }
 
     public String getWelcomeMessage() {
-        return "\t\tEnter 'apphelp' to get application commands\n"
-                + "\t\tEnter 'help' to get all shell commands\n";
+        return "\t\t\t\tEnter 'apphelp' to get application commands\n"
+                + "\t\t\t\tEnter 'help' to get all shell commands\n";
     }
 
     public String getProviderName() {

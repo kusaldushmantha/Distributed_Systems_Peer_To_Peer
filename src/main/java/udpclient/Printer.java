@@ -129,11 +129,11 @@ public class Printer {
     public static void printName(){
         StringBuffer buf = new StringBuffer();
         buf.append("\n");
-        buf.append("=======================================================")
+        buf.append("===============================================================================")
                 .append(OsUtils.LINE_SEPARATOR);
-        buf.append("*               Distributed Client Cli                *")
+        buf.append("|                           Distributed Client Cli                            |")
                 .append(OsUtils.LINE_SEPARATOR);
-        buf.append("=======================================================")
+        buf.append("===============================================================================")
                 .append(OsUtils.LINE_SEPARATOR);
         print_n( buf.toString(),boldGreen);
     }

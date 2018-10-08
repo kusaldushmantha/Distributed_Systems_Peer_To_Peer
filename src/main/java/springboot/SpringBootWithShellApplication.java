@@ -54,7 +54,7 @@ public class SpringBootWithShellApplication {
             HashMap<String, Object> props = new HashMap<>();
             props.put("server.port", tomcatPort);
 
-            System.out.print("\tStarting REST on port "+tomcatPort+" ... ");
+            System.out.print("\t\tStarting REST on port "+tomcatPort+" ... ");
             ctx = new SpringApplicationBuilder()
                     .sources(SpringBootWithShellApplication.class)
                     .properties(props)
@@ -66,8 +66,8 @@ public class SpringBootWithShellApplication {
             System.exit(0);
         }
 
-        print_nn("\n\t"+"IP : " + myIp + " \tUsername : " +myUserName +"\n"
-                + "\tUDP Port : " +myPort
+        print_nn("\n\t\t"+"IP : " + myIp + " \tUsername : " +myUserName +"\n"
+                + "\t\tUDP Port : " +myPort
                 + " \tREST port : " +tomcatPort, "\033[0;1m");
 
         SpringBootWithShellApplication application = new SpringBootWithShellApplication();
@@ -136,7 +136,7 @@ public class SpringBootWithShellApplication {
 
     private static void getTomCatPort(){
         Scanner scanner=new Scanner(System.in);
-        print("\tEnter REST port\t\t[" + tomcatPort + "]\t: ");
+        print("\t\tEnter REST port\t\t[" + tomcatPort + "]\t: ");
         String inPort=scanner.nextLine();
         if (inPort.equals("")) {
             //use default port
