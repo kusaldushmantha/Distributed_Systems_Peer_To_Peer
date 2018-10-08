@@ -56,7 +56,7 @@ public class Client {
         //printName("Distributed System Client Application");
 
         while (true) {
-            print("\nEnter port \t[" + myPort + "]\t: ");
+            print("\n\t\tEnter UDP port\t\t[" + myPort + "]\t: ");
             String inPort=scanner.nextLine();
             if (inPort.equals("")) {
                 try {
@@ -84,18 +84,15 @@ public class Client {
         }
 
         myUserName=getMyHostname();
-        print("Enter username \t["+myUserName+"]\t: ");
+
+        print("\t\tEnter username \t\t["+myUserName+"]\t: ");
         String inName=scanner.nextLine();
         if (!inName.equals("")) {
             myUserName=inName;
         }
 
-
         listeningThread = new Thread(Client::lookForMessages);
         listeningThread.start();
-
-        print_nn("\nIP address : " + myIp + " \tPort : " +myPort + " \tUsername : " +myUserName, "\033[0;1m");
-
 
         readAndGetRandomFiles(filepath); // get five files from File Names.txt
 

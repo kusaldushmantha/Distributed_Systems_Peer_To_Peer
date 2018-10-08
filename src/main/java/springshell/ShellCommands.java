@@ -15,12 +15,6 @@ import static udpclient.Util.getHelpText;
 @Component
 public class ShellCommands implements CommandMarker {
 
-    @CliCommand(value = { "test", "t" })
-    public String webGet() {
-        System.out.println("print test ok");
-        return "test ok";
-    }
-
     @CliCommand(value = "reg", help = "[reg server_ip] register to Bootstrap server")
     public void register(@CliOption(key = "ip") String ip){
         SendingMessageHandler.registerToBS(ip);
@@ -71,8 +65,8 @@ public class ShellCommands implements CommandMarker {
         changeMyPort(port);
     }
 
-    @CliCommand(value = "appexit", help = "exit from application followed by 'unreg' and 'leave' ")
-    public void exit(){
+    @CliCommand(value = {"appexit"}, help = "exit from application followed by 'unreg' and 'leave' ")
+    public void quit(){
         SendingMessageHandler.exit();
         System.exit(0);
     }

@@ -13,9 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static com.sun.javafx.scene.control.skin.Utils.getResource;
 import static udpclient.Client.*;
 import static udpclient.Printer.*;
 
@@ -104,8 +102,6 @@ public class Util {
         for (int i=0; i<range; i++) {
             selectedFiles.add(nameList.get(i));
         }
-
-        printSelectedFiles();
 
     }
 
