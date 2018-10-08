@@ -11,20 +11,7 @@ import org.springframework.stereotype.Component;
 public class AppBannerProvider extends DefaultBannerProvider {
 
     public String getBanner() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("\n");
-        buf.append("\033[1;34m");
-        buf.append("=======================================")
-                .append(OsUtils.LINE_SEPARATOR);
-        buf.append("*       Distributed Client Cli        *")
-                .append(OsUtils.LINE_SEPARATOR);
-        buf.append("=======================================")
-                .append(OsUtils.LINE_SEPARATOR);
-//        buf.append("Version:")
-//                .append(this.getVersion());
-
-        buf.append("\033[1;34m");
-        return buf.toString();
+        return "";
     }
 
     public String getVersion() {
@@ -32,10 +19,11 @@ public class AppBannerProvider extends DefaultBannerProvider {
     }
 
     public String getWelcomeMessage() {
-        return "\n";
+        return "\t\tEnter 'apphelp' to get application commands\n"
+                + "\t\tEnter 'help' to get all shell commands\n";
     }
 
     public String getProviderName() {
-        return "DsApp Banner";
+        return "Distributed Client";
     }
 }

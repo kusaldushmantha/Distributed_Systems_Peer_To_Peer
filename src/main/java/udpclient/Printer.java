@@ -1,5 +1,7 @@
 package udpclient;
 
+import org.springframework.shell.support.util.OsUtils;
+
 import java.net.DatagramPacket;
 import java.util.Map;
 
@@ -122,4 +124,19 @@ public class Printer {
         selectedFiles.forEach(file->print_n("\t"+file,highIntensityWhite));
         print_n("");
     }
+
+
+    public static void printName(){
+        StringBuffer buf = new StringBuffer();
+        buf.append("\n");
+        buf.append("=======================================================")
+                .append(OsUtils.LINE_SEPARATOR);
+        buf.append("*               Distributed Client Cli                *")
+                .append(OsUtils.LINE_SEPARATOR);
+        buf.append("=======================================================")
+                .append(OsUtils.LINE_SEPARATOR);
+        print_n( buf.toString(),boldGreen);
+    }
+
+
 }

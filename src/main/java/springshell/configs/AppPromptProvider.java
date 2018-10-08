@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlType;
 public class AppPromptProvider extends DefaultPromptProvider {
 
     public String getPrompt() {
-        return "$ ";
+        return "Client:~$ ";
     }
 
     public String getProviderName() {
