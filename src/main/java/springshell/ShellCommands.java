@@ -1,71 +1,102 @@
 package springshell;
 
-import org.springframework.shell.core.CommandMarker;
-import org.springframework.shell.core.annotation.CliCommand;
-import org.springframework.shell.core.annotation.CliOption;
+
+import javafx.application.Application;
+import org.jline.utils.AttributedString;
+import org.jline.utils.AttributedStyle;
+import org.springframework.context.annotation.Bean;
+import org.springframework.shell.jline.InteractiveShellApplicationRunner;
+import org.springframework.shell.jline.PromptProvider;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.standard.commands.Help;
+import org.springframework.shell.standard.commands.Quit;
 import org.springframework.stereotype.Component;
+import springboot.SpringBootWithShellApplication;
 import udpclient.SendingMessageHandler;
 
-import static udpclient.Printer.printHelp;
-import static udpclient.Printer.printRoutingTable;
-import static udpclient.Printer.printSelectedFiles;
+import static org.jline.utils.AttributedStyle.YELLOW;
+import static udpclient.Printer.*;
 import static udpclient.Util.changeMyPort;
 import static udpclient.Util.getHelpText;
 
-@Component
-public class ShellCommands implements CommandMarker {
+@ShellComponent
+public class ShellCommands implements Quit.Command, Help.Command {
 
-    @CliCommand(value = "reg", help = "[reg server_ip] register to Bootstrap server")
-    public void register(@CliOption(key = "ip") String ip){
+
+    //shell prompt
+    @Bean
+    public PromptProvider promptProvider() {
+        return () -> new AttributedString("Client~$ ",   AttributedStyle.DEFAULT.foreground(YELLOW));
+    }
+
+
+    @ShellMethod(key = "reg",value = "[reg ip] register to Bootstrap server")
+    public void register(@ShellOption() String ip){
         SendingMessageHandler.registerToBS(ip);
     }
 
-    @CliCommand(value = "regl", help = "register to Bootstrap server running on same ip")
+    @ShellMethod("Say hello.")
+    public String greet(@ShellOption(defaultValue="World") String who) {
+
+        return "Hello " + who;
+    }
+
+    @ShellMethod(key = "regl", value = "register to Bootstrap server running on same ip")
     public void registerLocalBsServer(){
         SendingMessageHandler.registerToBSonSameIp();
     }
 
-    @CliCommand(value = "unreg", help = "unregister from Bootstrap server")
+    @ShellMethod(key = "unreg", value = "unregister from Bootstrap server")
     public void unregister(){
         SendingMessageHandler.unregisterFromBS();
     }
 
-    @CliCommand(value = "table", help = "show routing table")
+    @ShellMethod(key = "table", value = "show routing table")
     public void table(){
         printRoutingTable();
     }
 
-    @CliCommand(value = "join", help = "join to neighbours in routing table")
+    @ShellMethod(key = "join", value = "join to neighbours in routing table")
     public void join(){
         SendingMessageHandler.joinToSystem();
     }
 
-    @CliCommand(value = "leave",help = "leave from neighbours")
+    @ShellMethod(key = "leave",value = "leave from neighbours")
     public void leave(){
         SendingMessageHandler.leaveTheSystem();
     }
 
-    @CliCommand(value = "search",help = "[search file_name hops(optional)] search files in network by name")
-    public void search(@CliOption(key = "name") String name,@CliOption(key = "hops") int hops){
+    @ShellMethod(key = "search",value = "[search file_name hops(optional)] search files in network by name")
+    public void search(@ShellOption() String name,@ShellOption(defaultValue="1") String hopsStr ){
+        int hops=1;
+        if (hopsStr!=null){
+            try{
+                hops=Integer.parseInt(hopsStr);
+            }catch (Exception e){
+                print_ng("Number format error for hops");
+            }
+        }
         SendingMessageHandler.searchFile(name,hops);
     }
 
-    @CliCommand(value = "files", help = "show selected files")
+    @ShellMethod(key = "files", value = "show selected files")
     public void files(){
         printSelectedFiles();
     }
 
-    @CliCommand(value = "apphelp", help = "app commands (this)")
+    @ShellMethod(key = "help", value = "app commands (this)")
     public void help(){
         printHelp(getHelpText());
     }
 
-    @CliCommand(value = "setport", help = "[setport port] change port if registration failed")
-    public void setport(@CliOption(key = "port") String port){
+    @ShellMethod(key = "setport", value = "[setport port] change port if registration failed")
+    public void setport(@ShellOption() String port){
         changeMyPort(port);
     }
 
-    @CliCommand(value = {"appexit"}, help = "exit from application followed by 'unreg' and 'leave' ")
+    @ShellMethod(key = {"quit", "exit"}, value = "exit from application followed by 'unreg' and 'leave' ")
     public void quit(){
         SendingMessageHandler.exit();
         System.exit(0);

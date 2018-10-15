@@ -114,18 +114,18 @@ public class Util {
 
     public static String getHelpText(){
         StringBuilder sb=new StringBuilder();
-        sb.append("\t").append("reg server_ip").append("\t\t\t\t - ").append("register to Bootstrap server").append("\n");
+        sb.append("\t").append("reg server_ip").append("\t\t\t - ").append("register to Bootstrap server").append("\n");
         sb.append("\t").append("regl").append("\t\t\t\t\t - ").append("register to Bootstrap server running on same ip").append("\n");
         sb.append("\t").append("unreg").append("\t\t\t\t\t - ").append("unregister from Bootstrap server").append("\n");
         sb.append("\t").append("join").append("\t\t\t\t\t - ").append("join to neighbours in routing table").append("\n");
         sb.append("\t").append("leave").append("\t\t\t\t\t - ").append("leave from neighbours").append("\n");
         sb.append("\t").append("table").append("\t\t\t\t\t - ").append("show routing table").append("\n");
         sb.append("\t").append("files").append("\t\t\t\t\t - ").append("show selected files").append("\n");
-        sb.append("\t").append("search file_name hops(optional)").append("\t\t - ").append("search files in network by name").append("\n");
-        sb.append("\t").append("appexit").append("\t\t\t\t\t - ").append("exit from application followed by 'unreg' and 'leave' ").append("\n");
+        sb.append("\t").append("search file_name hops(optional)").append("\t - ").append("search files in network by name").append("\n");
+        sb.append("\t").append("exit").append("\t\t\t\t\t - ").append("exit from application followed by 'unreg' and 'leave' ").append("\n");
         sb.append("\t  ____\n\n");
-        sb.append("\t").append("apphelp").append("\t\t - ").append("app commands (this)").append("\n");
-        sb.append("\t").append("setport port").append("\t - ").append("change port if registration failed").append("\n");
+        sb.append("\t").append("help").append("\t\t\t\t\t - ").append("app commands (this)").append("\n");
+        sb.append("\t").append("setport port").append("\t\t\t - ").append("change port if registration failed").append("\n");
         return sb.toString();
     }
 
