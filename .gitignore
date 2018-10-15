@@ -24,4 +24,5 @@
 /nbdist/
 /.nb-gradle/
 
-dsapp-shell.log
+spring-shell.log
+sendingFiles/
