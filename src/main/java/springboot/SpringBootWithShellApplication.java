@@ -1,26 +1,18 @@
 package springboot;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.embedded.tomcat.ConnectorStartFailedException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.event.EventListener;
-import org.springframework.util.StopWatch;
 import udpclient.Client;
-import udpclient.Printer;
 
-import java.net.BindException;
-import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Scanner;
-import static udpclient.Client.*;
 
+import static udpclient.Client.*;
 import static udpclient.Printer.*;
+import static udpclient.Util.isPortAvailable;
 
 @SpringBootApplication
 @ComponentScan(
@@ -58,7 +50,7 @@ public class SpringBootWithShellApplication {
 
 //            ctx = SpringApplication.run(SpringBootWithShellApplication.class);
         }catch (ConnectorStartFailedException e){
-            print_ng("port 8080 is using by a process. Kill it firt and try again");
+            print_ng("Port is used by another process");
             System.exit(0);
         }
 
@@ -68,18 +60,34 @@ public class SpringBootWithShellApplication {
 
 
     private static void getTomCatPort(){
+
+        int defaultPort=tomcatPort;
+        while (!isPortAvailable(defaultPort)){
+            defaultPort=tomcatPort++;
+        }
+
         Scanner scanner=new Scanner(System.in);
-        print("\t\tEnter REST port\t\t[" + tomcatPort + "]\t: ");
-        String inPort=scanner.nextLine();
-        if (inPort.equals("")) {
-            //use default port
-        }else {
-            while (true){
+        while (true){
+            print("\t\tEnter REST port\t\t[" + defaultPort + "]\t: ");
+            String inPort=scanner.nextLine();
+            if (inPort.equals("")) {
+                if (isPortAvailable(defaultPort)){
+                    tomcatPort=defaultPort;
+                    break;
+                }else {
+                    print_ng("\t\tPermission denied. Use a different port");
+                    defaultPort++;
+                }
+            }else {
                 try {
                     tomcatPort = Integer.parseInt(inPort);
-                    break;
+                    if (isPortAvailable(tomcatPort)){
+                        break;
+                    }else {
+                        print_ng("\t\tPermission denied. Use a different port");
+                    }
                 }catch (NumberFormatException e){
-                    print_ng("Wrong input for port");
+                    print_ng("\t\tWrong input for port");
                 }
             }
         }

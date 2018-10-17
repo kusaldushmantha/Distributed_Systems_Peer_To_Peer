@@ -55,16 +55,22 @@ public class Client {
 
         //printName("Distributed System Client Application");
 
+        int defaultPort=myPort;
+        while (!isPortAvailable(defaultPort)){
+            defaultPort=myPort++;
+        }
+
         while (true) {
-            print("\n\t\tEnter UDP port\t\t[" + myPort + "]\t: ");
+            print("\n\t\tEnter UDP port\t\t[" + defaultPort + "]\t: ");
             String inPort=scanner.nextLine();
             if (inPort.equals("")) {
                 try {
-                    socket = new DatagramSocket(myPort);
+                    myPort=defaultPort;
+                    socket = new DatagramSocket(defaultPort);
                     break;
                 }catch (BindException e){
-                    print_ng("Permission denied. Use a different port");
-                    myPort++;
+                    print_ng("\t\tPermission denied. Use a different port");
+                    defaultPort++;
                 } catch (SocketException e) {
                     e.printStackTrace();
                 }
@@ -74,9 +80,9 @@ public class Client {
                     socket = new DatagramSocket(myPort);
                     break;
                 }catch (BindException e){
-                    print_ng("Permission denied. Use a different port");
+                    print_ng("\t\tPermission denied. Use a different port");
                 }catch (NumberFormatException e){
-                    print_ng("Wrong input for port");
+                    print_ng("\t\tWrong input for port");
                 } catch (SocketException e) {
                     e.printStackTrace();
                 }
@@ -245,13 +251,13 @@ public class Client {
         }else {
             routingTable.put(node.getKey(),node);
             rgStatus.routingTableStatus_plus1();
-            print_ng("Added Neighbour to routing table <- "+node.getKey()+" by "+addedBy);
+            print_ng("Routing table <-added "+node.getKey()+" by "+addedBy);
         }
     }
     public static void removeFromRoutingTable(Node node){
         if (routingTable.containsKey(node.getKey())){
             routingTable.remove(node.getKey());
-            print_ng("Removing Neighbour from routing table : "+node.getKey());
+            print_ng("Routing table ->remove "+node.getKey());
         }
     }
 

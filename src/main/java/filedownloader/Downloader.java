@@ -1,19 +1,24 @@
-package FileDownloader;
+package filedownloader;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import static udpclient.Printer.print_n;
 
 public class Downloader {
 
+    private static final String SAVE_DIR = "downloaded_files";
+
     private static final int BUFFER_SIZE = 4096;
 
-    public static void downloadFile(String fileURL, String saveDir){
+
+    public static void downloadFile(String fileURL){
+
+        String saveDir=SAVE_DIR;
 
         File directory = new File(saveDir);
         if (! directory.exists()){
@@ -21,7 +26,14 @@ public class Downloader {
         }
 
         try {
-            URL url = new URL(fileURL);
+
+            //encode file name to handle spaces
+            String[] split = fileURL.split("name=");
+            String encodedName = URLEncoder.encode(split[1], "UTF-8");
+            String urlEncodedName=split[0]+"name="+encodedName;
+
+
+            URL url = new URL(urlEncodedName);
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
             int responseCode = httpConn.getResponseCode();
 

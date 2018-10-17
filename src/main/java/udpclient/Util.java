@@ -6,12 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static udpclient.Client.*;
@@ -26,16 +21,49 @@ public class Util {
         ArrayList<String> foundFiles=new ArrayList<>();
 
         for (String fileName:selectedFiles){
-            for (String word:fileName.split(" ")){
+            for (String word:fileName.split(" ")){ //for space separated words in selected files
                 if (word.equalsIgnoreCase(searchName)){
                     foundFiles.add(fileName);
                     break;
                 }
             }
+            if (fileName.equalsIgnoreCase(searchName)){ //chek for hall file name in selected files
+                foundFiles.add(fileName);
+                break;
+            }
         }
 
         return foundFiles;
     }
+
+    public static boolean isPortAvailable(int port) {
+
+        ServerSocket ss = null;
+        DatagramSocket ds = null;
+        try {
+            ss = new ServerSocket(port);
+            ss.setReuseAddress(true);
+            ds = new DatagramSocket(port);
+            ds.setReuseAddress(true);
+            return true;
+        } catch (IOException e) {
+        } finally {
+            if (ds != null) {
+                ds.close();
+            }
+
+            if (ss != null) {
+                try {
+                    ss.close();
+                } catch (IOException e) {
+                    /* should not be thrown */
+                }
+            }
+        }
+        return false;
+    }
+
+
 
     public static String getMyIp() {
         try(final DatagramSocket socket = new DatagramSocket()){
@@ -111,6 +139,35 @@ public class Util {
         return msg_formatted;
     }
 
+
+    public static HashMap<String,Object> divideHopsAndFiles(String s){
+
+        int firstQuotationIndex=s.indexOf('\"');
+        int lastQuotationIndex=0;
+        for (int i=0;i<s.length();i++){
+            if (s.charAt(i)=='\"'){
+                lastQuotationIndex=i;
+            }
+        }
+
+        String hopsStr = s.substring(lastQuotationIndex+1,s.length()).trim();
+        String[] filesStr= s.substring(firstQuotationIndex,lastQuotationIndex+1).split("\"");
+
+        ArrayList<String> fileList=new ArrayList<String>();
+        for (String str:filesStr){
+            fileList.add(str);
+        }
+        fileList.remove("");
+        fileList.remove(" ");
+
+        HashMap<String, Object> map = new HashMap<String, Object>();
+
+        map.put("files",fileList);
+        map.put("hops",hopsStr);
+
+        return map;
+
+    }
 
     public static String getHelpText(){
         StringBuilder sb=new StringBuilder();

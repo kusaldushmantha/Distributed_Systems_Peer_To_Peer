@@ -113,11 +113,21 @@ public class SendingMessageHandler {
         }
 
         try {
-            String filename = st.nextToken();
+            String fileNameCreator="";
+            String hopsStr="";
+            while (st.hasMoreTokens()){
+                String part=st.nextToken();
+                fileNameCreator+=part+" ";
+                hopsStr=part;
+            }
+
+            String filename = fileNameCreator.substring(1, (fileNameCreator.length() - hopsStr.length() - 3));
+
+
             int hops=1;
             if(st.hasMoreTokens()) {
                 try {
-                    hops = Integer.parseInt(st.nextToken());
+                    hops = Integer.parseInt(hopsStr);
                 }catch (NumberFormatException e){
                     print_nng("Wrong hops value");
                 }
@@ -136,7 +146,7 @@ public class SendingMessageHandler {
      */
     public static void searchFile(String filename,int hops){
         /* length SER IP port file_name hops */
-        String msg = "SER " + myIp + " " + myPort + " " + filename + " " + hops;
+        String msg = "SER " + myIp + " " + myPort + " \"" + filename + "\" " + hops;
         String msg_formatted = formatMessage(msg);
 
         for (Entry<String, Node> entry : getRoutingTable().entrySet()) {

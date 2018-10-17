@@ -54,7 +54,7 @@ public class Printer {
     }
 
     public static void print_ng(String msg) {
-        String msg_=colorText(" > ",bold)+colorText(msg,highIntensityWhite);
+        String msg_=colorText(msg,highIntensityWhite);
         print_n(msg_);
     }
 
@@ -77,7 +77,7 @@ public class Printer {
         if (ip.equals(bs_ip) && port==bs_port){
             bs=" [BS] ";
         }
-        print_n(colorText("Received:",boldBlack) + colorText(" <= ",boldYellow)+colorText(msg,boldYellow)+colorText(" from "+sender+bs, generalColor));
+        print_n( colorText(" <= ",boldYellow)+colorText(msg,boldYellow)+colorText(" from "+sender+bs, generalColor));
     }
 
     public static void print_Sending(String ip, int port, String msg,String commandType) {
@@ -88,33 +88,33 @@ public class Printer {
                 bs=" [BS] ";
             }
         }
-        print_n( colorText("Sending: ",boldBlack)+colorText(" => ",boldBlue) +colorText(msg,boldBlue)+colorText(" to "+sender+bs+ colorText(" ["+ commandType+" command]",bold), generalColor) );
+        print_n( colorText(" => ",boldBlue) +colorText(msg,boldBlue)+colorText(" to "+sender+bs+ colorText(" ["+ commandType+" command]",bold), generalColor) );
     }
 
 
     public static void print_Success(String msg){
-        String msg_=colorText(" > ",bold)+colorText("Success: ",boldGreen)+colorText(msg, generalColor);
+        String msg_=colorText("Success: ",boldGreen)+colorText(msg, generalColor);
         print_n(msg_);
     }
 
     public static void print_Success_n(String msg){
-        String msg_=colorText(" > ",bold)+colorText("Success: ",boldGreen)+colorText(msg, generalColor);
+        String msg_=colorText("Success: ",boldGreen)+colorText(msg, generalColor);
         print_n(msg_+"\n");
     }
 
     public static void print_Error_n(String msg){
-        String msg_=colorText(" > ",bold)+colorText("Error: ",boldRed)+colorText(msg, generalColor);
+        String msg_=colorText("Error: ",boldRed)+colorText(msg, generalColor);
         print_n(msg_+"\n");
     }
 
 
     public static void printHelp(String help) {
-        print_n(colorText(" > ",bold)+colorText("Application commands\n",underlinedHighIntensityWhite));
+        print_n(colorText("Application commands\n",underlinedHighIntensityWhite));
         print_nn(help,highIntensityWhite);
     }
 
     public static void printRoutingTable() {
-        print_n(colorText(" > ",bold)+colorText("Routing table\n",underlinedHighIntensityWhite));
+        print_n(colorText("Routing table\n",underlinedHighIntensityWhite));
         if (getRoutingTable().isEmpty()){
             print_nn("\tTable is empty",highIntensityWhite);
             return;
