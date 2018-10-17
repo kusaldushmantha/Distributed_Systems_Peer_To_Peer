@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.channels.Channels;
 
+import static udpclient.Printer.print_n;
+
 @RestController
 public class RestControllerClass {
 
@@ -23,14 +25,14 @@ public class RestControllerClass {
     }
 
     @RequestMapping("/download")
-    public ResponseEntity<Resource> downloadFiled(@RequestParam("name") String filename, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResponseEntity<Resource> downloadFiled(@RequestParam("name") String fileName, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String directoryName="sendingFiles";
+        String directoryName="sent_files";
         File directory = new File(directoryName);
         if (! directory.exists()){
             directory.mkdir();
         }
-        RandomAccessFile f = new RandomAccessFile(directoryName+"/"+filename, "rw");
+        RandomAccessFile f = new RandomAccessFile(directoryName+"/"+fileName, "rw");
         int mbytes=2;
 
         f.setLength(1024 * 1024 * mbytes );
@@ -43,9 +45,12 @@ public class RestControllerClass {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type",  "application/octet-stream");
-        headers.add("Content-Disposition", String.format("attachment;filename=" + filename ));
+        headers.add("Content-Disposition", String.format("attachment; filename=\"" + fileName + "\"" ));
         headers.add("Content-Length", Integer.toString(length));
 
+
+        int sizeInMb=length/(1024*1024);
+        print_n("Uploader > "+"Uploading\t"+ "File name: " +fileName +"\tSize: "+sizeInMb+"MB");
 
         return ResponseEntity.ok()
                 .headers(headers)

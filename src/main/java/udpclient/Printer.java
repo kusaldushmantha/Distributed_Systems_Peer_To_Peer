@@ -19,8 +19,17 @@ public class Printer {
     private static String boldYellow="\033[1;33m";
     private static String bold="\033[0;1m";
 
+    private static String OS = System.getProperty("os.name").toLowerCase();
+
+    public static boolean isWindows() {
+        return (OS.indexOf("win") >= 0);
+    }
 
     public static String colorText(String msg, String colorCode){
+        //windows command prompt doesn't support these colors
+        if (isWindows()){
+            return msg;
+        }
         return colorCode+msg+generalColor;
     }
 

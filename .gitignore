@@ -25,4 +25,5 @@
 /.nb-gradle/
 
 spring-shell.log
-sendingFiles/
+sent_files/
+downloaded_files/

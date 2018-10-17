@@ -1,7 +1,9 @@
 package springshell;
 
 
+import FileDownloader.Downloader;
 import javafx.application.Application;
+import org.apache.commons.io.FileUtils;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +18,11 @@ import org.springframework.stereotype.Component;
 import springboot.SpringBootWithShellApplication;
 import udpclient.SendingMessageHandler;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import static org.jline.utils.AttributedStyle.YELLOW;
 import static udpclient.Printer.*;
 import static udpclient.Util.changeMyPort;
@@ -23,14 +30,6 @@ import static udpclient.Util.getHelpText;
 
 @ShellComponent
 public class ShellCommands implements Quit.Command, Help.Command {
-
-
-    //shell prompt
-    @Bean
-    public PromptProvider promptProvider() {
-        return () -> new AttributedString("Client~$ ",   AttributedStyle.DEFAULT.foreground(YELLOW));
-    }
-
 
     @ShellMethod(key = "reg",value = "[reg ip] register to Bootstrap server")
     public void register(@ShellOption() String ip){
@@ -101,5 +100,13 @@ public class ShellCommands implements Quit.Command, Help.Command {
         SendingMessageHandler.exit();
         System.exit(0);
     }
+
+    @ShellMethod(key="download" , value = "download a file froma given url")
+    public void downlaod(@ShellOption("url") String urlStr){
+
+        Downloader.downloadFile(urlStr,"downloaded_files");
+
+    }
+
 
 }
