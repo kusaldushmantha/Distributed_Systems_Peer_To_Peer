@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ResponseHandler implements Runnable {
 
@@ -69,16 +71,33 @@ public class ResponseHandler implements Runnable {
 
             }else if(command.equals("SER")){
                 String result = searchForFile(requestOnNode[4].trim());
-                if(!result.equals("")){
-                    String ipaddress = requestOnNode[2].trim();
-                    String port = requestOnNode[3].trim();
-                    sendSearchStatus(ipaddress,Integer.parseInt(port),result,0);
+                
+                String ipaddress = requestOnNode[2].trim();
+                String port = requestOnNode[3].trim();
+                    
+                //initialize the hopes count
+                int hops = Integer.parseInt(requestOnNode[5].trim());
+                if(requestOnNode[3].trim().equals(this.socket.getLocalPort()+"")){
+                        
+                       hops = 0;
                 }else{
+                       hops++;
+                }
+                if(hops>20){
+                    sendSearchStatus(ipaddress,Integer.parseInt(port),result,hops,9999);
+                }
+                else if(!result.equals("")){
+                    sendSearchStatus(ipaddress,Integer.parseInt(port),result,hops,0);
+                }else{
+                    
+                    // Address also need to equal
+                   
                     Random random = new Random();
                     List<String> keys = new ArrayList<String>(this.routingTable.keySet());
                     String randomKey = keys.get( random.nextInt(keys.size()) );
                     String value = this.routingTable.get(randomKey);
-                    sendMSG(new String(packet.getData()),value.split(" ")[0].substring(1).trim(),value.split(" ")[1].trim());
+                    String data = requestOnNode[1].trim()+" "+requestOnNode[2].trim()+" "+requestOnNode[3].trim()+" "+requestOnNode[4].trim()+" "+hops;
+                    sendMSG(formatString(data),value.split(" ")[0].substring(1).trim(),value.split(" ")[1].trim());
                 }
             }else if(command.equals("SEROK")){
                 this.isValueSet = true;
@@ -123,12 +142,12 @@ public class ResponseHandler implements Runnable {
         }
     }
     
-    private void sendSearchStatus(String ipaddress, int senderPort, String results, int status){
+    private void sendSearchStatus(String ipaddress, int senderPort, String results, int hops,int status){
         System.out.println("send serach status");
         String joinResponse = "";
         try {
         if(status == 0){
-            joinResponse = "SEROK " +InetAddress.getLocalHost().getHostAddress()+" "+this.socket.getLocalPort()+" "+results;
+            joinResponse = "SEROK " +InetAddress.getLocalHost().getHostAddress()+" "+this.socket.getLocalPort()+" "+hops+" "+results;
         }else{
             joinResponse = "SEROK 9999 " + this.username;
         }
@@ -145,10 +164,8 @@ public class ResponseHandler implements Runnable {
     }
     private void sendMSG(String nodeCmd,String nodeIP, String nodePort){
         try{
-            
             String toConnectNodeIP = nodeIP;
             int toConnectNodePort = Integer.parseInt(nodePort);
-            System.out.println(nodeCmd+" "+nodeIP+" "+nodePort);
             byte[] bytesToSend = nodeCmd.getBytes();
             InetAddress inetAddress = InetAddress.getLocalHost();
             DatagramPacket packet = new DatagramPacket(bytesToSend, bytesToSend.length, inetAddress, toConnectNodePort);
@@ -156,6 +173,7 @@ public class ResponseHandler implements Runnable {
         }catch (Exception e){
             System.out.println(e);
         }finally {
+            
             this.isValueSet = false;
             System.out.println("Client Command: ");
         }

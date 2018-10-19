@@ -138,10 +138,14 @@ public class Client{
         }
     }
     private void sendMSG(String msg){
-
-        String joinString = "SER " + this.ipAddress + " " + this.port + " " + msg;
-        joinString = formatString(joinString);
-        String joinResponse = nodeCommand(joinString);
+        String joinString;
+        try {
+            joinString = "SER " +InetAddress.getLocalHost().getHostAddress()+ " " + this.port + " " + msg+" "+0;
+            joinString = formatString(joinString);
+            String joinResponse = nodeCommand(joinString);
+        } catch (UnknownHostException ex) {
+           return;
+        }
 //        String regCmd = "SER " + this.ipAddress + " " + this.port + " " + ipAddress+" "+port;
 //        String serverResponseStatus = nodeCommand(formatString(regCmd));
     }
