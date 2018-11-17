@@ -8,6 +8,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import static udpclient.Printer.print_n;
+import static udpclient.Printer.print_ng;
+import static udpclient.Printer.print_nng;
+import static udpclient.Util.getHash;
 
 public class Downloader {
 
@@ -40,6 +43,8 @@ public class Downloader {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String fileName = "";
                 String disposition = httpConn.getHeaderField("Content-Disposition");
+                String hashSentByServer = httpConn.getHeaderField("File-Hash");
+
                 String contentType = httpConn.getContentType();
                 int contentLength = httpConn.getContentLength();
 
@@ -71,12 +76,22 @@ public class Downloader {
 
                 int sizeInMb=contentLength/(1024*1024);
 
-                print_n("Downloader > "+"Downloaded\t"+ "File name: " +fileName +"\tSize: "+sizeInMb+"MB");
+                print_ng("Downloader > "+"Downloaded\t"+ "File name: " +fileName +"\tSize: "+sizeInMb+"MB");
+
+                String hash = getHash(new File(saveFilePath));
+
+                print_ng("Downloader > " + "Calculated hash: \t" +hash);
+                print_ng("Downloader > " + "Server sent hash: \t" +hashSentByServer);
+
+
             } else {
                 System.out.println("No file to download. Server replied HTTP code: " + responseCode);
             }
             httpConn.disconnect();
-        }catch (Exception e){
+        }catch (ArrayIndexOutOfBoundsException e){
+            print_ng("Downloader > " + "please define file name");
+        }
+        catch (Exception e){
             e.printStackTrace();
         }
     }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import static springboot.SpringBootWithShellApplication.tomcatPort;
 import static udpclient.Client.*;
 import static udpclient.Printer.*;
 import static udpclient.Util.*;
@@ -220,7 +221,8 @@ public class ReceivingMessageHandler {
 
                     filesStr=filesStr.substring(0, filesStr.length() - 2); //remove last comma and space
 
-                    print_nng("Neighbour " + ip_file_owner + ":" + port_file_owner + " has : " + filesStr);
+                    print_ng("Neighbour " + ip_file_owner + ":" + port_file_owner + " has : " + filesStr);
+                    print_nng("download http://" + ip_file_owner + ":" + port_file_owner + "/download?name=\"" + filesStr+"\"");
 
                     //collect data until hops==1
 
@@ -256,11 +258,11 @@ public class ReceivingMessageHandler {
             filesStr+="\""+file+ "\" ";
         }
 
-        String msg="SEROK "+ foundFiles.size() + " " + myIp + " " + myPort +" " + hops + " " + filesStr.trim() ;
+        String msg="SEROK "+ foundFiles.size() + " " + myIp + " " + tomcatPort +" " + hops + " " + filesStr.trim() ;
         String msg_formatted = formatMessage(msg);
         sendPacket(ip_file_needed,port_file_needed,msg_formatted, "Search Ok");
 
-        print_ng("File data sent to "+ip_file_needed+":"+port_file_needed);
+        print_nng("File data sent to "+ip_file_needed+":"+port_file_needed);
 
         /*
         Manage hops
@@ -280,7 +282,7 @@ public class ReceivingMessageHandler {
                 }
             }
             if (forwardedHops==0){
-                print_ng("No other neighbours to forward this search");
+                print_nng("No other neighbours to forward this search");
             }
 
         }

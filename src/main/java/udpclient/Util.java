@@ -1,9 +1,10 @@
 package udpclient;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
+
+import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -131,6 +132,16 @@ public class Util {
             selectedFiles.add(nameList.get(i));
         }
 
+    }
+
+    public static String getHash(File file){
+        HashCode hc = null;
+        try {
+            hc = Files.asByteSource(file).hash(Hashing.md5());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return hc.toString();
     }
 
 

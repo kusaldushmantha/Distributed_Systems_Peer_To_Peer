@@ -1,5 +1,8 @@
 package springboot.rest;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +19,9 @@ import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 
 import static udpclient.Printer.print_n;
+import static udpclient.Printer.print_ng;
+import static udpclient.Printer.print_nng;
+import static udpclient.Util.getHash;
 
 @Component
 public class UploadService {
@@ -42,7 +48,9 @@ public class UploadService {
             if (! directory.exists()){
                 directory.mkdir();
             }
-            RandomAccessFile f = new RandomAccessFile(directoryName+"/"+fileName, "rw");
+
+            String filePath=directoryName+"/"+fileName;
+            RandomAccessFile f = new RandomAccessFile(filePath, "rw");
             int mbytes=2;
 
             f.setLength(1024 * 1024 * mbytes );
@@ -52,15 +60,18 @@ public class UploadService {
 
             int length=(int) f.length();
 
+            String hash = getHash(new File(filePath));
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type",  "application/octet-stream");
             headers.add("Content-Disposition", String.format("attachment; filename=\"" + fileName + "\"" ));
             headers.add("Content-Length", Integer.toString(length));
+            headers.add("File-Hash",hash);
 
 
             int sizeInMb=length/(1024*1024);
-            print_n("Uploader > "+"Uploading\t"+ "File name: " +fileName +"\tSize: "+sizeInMb+"MB");
+            print_ng("Uploader > "+"Uploading\t"+ "File name: " +fileName +"\tSize: "+sizeInMb+"MB");
+            print_ng("Uploader > "+"Uploading "+"\tFile hash: " + hash);
 
             return ResponseEntity.ok()
                     .headers(headers)

@@ -122,7 +122,7 @@ public class Printer {
         int i=0;
 
         for (Map.Entry<String,Node> entry:getRoutingTable().entrySet()){
-            print_n("\t["+(++i)+"]\t"+"key="+entry.getKey()+"\t\t" +entry.getValue().details(),highIntensityWhite);
+            print_n("["+(++i)+"]\t"+"key="+entry.getKey()+"\t\t" +entry.getValue().details(),highIntensityWhite);
         }
         print_n("");
     }

@@ -251,13 +251,13 @@ public class Client {
         }else {
             routingTable.put(node.getKey(),node);
             rgStatus.routingTableStatus_plus1();
-            print_ng("Routing table <-added "+node.getKey()+" by "+addedBy);
+            print_nng("Routing table <-added "+node.getKey()+" by "+addedBy);
         }
     }
     public static void removeFromRoutingTable(Node node){
-        if (routingTable.containsKey(node.getKey())){
+        if (routingTable.containsKey(node.getKey()))    {
             routingTable.remove(node.getKey());
-            print_ng("Routing table ->remove "+node.getKey());
+            print_nng("Routing table ->remove "+node.getKey());
         }
     }
 
