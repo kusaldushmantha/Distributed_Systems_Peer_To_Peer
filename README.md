@@ -11,7 +11,7 @@ otherwise use
 
 <b>To run</b>  
 ```
-java -jar target/dsapp-1.jar  
+java -jar target/dsapp.jar  
 ```
 
 <b>Application commands</b>

@@ -17,25 +17,28 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
+import java.util.Random;
 
-import static udpclient.Printer.print_n;
 import static udpclient.Printer.print_ng;
-import static udpclient.Printer.print_nng;
 import static udpclient.Util.getHash;
 
 @Component
 public class UploadService {
 
+    private Random random = new Random();
+    private int fileSizeLower=2;
+    private int fileSizeUpper=10;
+
     public ResponseEntity<Resource> sendFileIfExixt(String fileName, HttpServletRequest request, HttpServletResponse response){
 
         final boolean fileExist = Client.selectedFiles.contains(fileName);
 
-        print_n("Uploader > "+"file name: "+fileName+"\tfile exist: "+fileExist);
+        print_ng("Uploader > "+" Got request"+"\tFile name: "+fileName+"\tfile exist: "+fileExist);
 
         if (fileExist && fileName!=""){
                 return sendFile(fileName);
         }else {
-            print_n("Uploader > "+"Sending Not Found");
+            print_ng("Uploader > "+"Sending Not Found");
             return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -51,7 +54,7 @@ public class UploadService {
 
             String filePath=directoryName+"/"+fileName;
             RandomAccessFile f = new RandomAccessFile(filePath, "rw");
-            int mbytes=2;
+            int mbytes=random.nextInt(fileSizeUpper-fileSizeLower) + fileSizeLower;
 
             f.setLength(1024 * 1024 * mbytes );
             InputStream inputStream = Channels.newInputStream(f.getChannel());

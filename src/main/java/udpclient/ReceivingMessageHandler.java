@@ -30,7 +30,6 @@ public class ReceivingMessageHandler {
                 Node neighbour= new Node(st.nextToken(),st.nextToken(),"");
 
                 addToRoutingTable(neighbour,"BS Response");
-                print_n("");
                 break;
 
             case 2:
@@ -41,7 +40,6 @@ public class ReceivingMessageHandler {
 
                 Node neighbour2= new Node(st.nextToken(),st.nextToken(),"");
                 addToRoutingTable(neighbour2,"Bootstrap Server Response");
-                print_n("");
                 break;
 
             case 9999:

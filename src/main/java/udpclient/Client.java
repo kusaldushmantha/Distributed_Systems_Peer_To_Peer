@@ -191,6 +191,7 @@ public class Client {
                         case "UNROK":
                             ReceivingMessageHandler.unregistrationOk(st);
                             break;
+
                     // messages from neighbours
                         case "JOINOK":
                             ReceivingMessageHandler.joinOk(st, incoming);
