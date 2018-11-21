@@ -1,8 +1,5 @@
 package springboot.rest;
 
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
-import com.google.common.io.Files;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +17,7 @@ import java.nio.channels.Channels;
 import java.util.Random;
 
 import static udpclient.Printer.print_ng;
+import static udpclient.Printer.print_nng;
 import static udpclient.Util.getHash;
 
 @Component
@@ -38,7 +36,7 @@ public class UploadService {
         if (fileExist && fileName!=""){
                 return sendFile(fileName);
         }else {
-            print_ng("Uploader > "+"Sending Not Found");
+            print_ng("Uploader > "+"Sending 'Not Found'");
             return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -74,7 +72,7 @@ public class UploadService {
 
             int sizeInMb=length/(1024*1024);
             print_ng("Uploader > "+"Uploading\t"+ "File name: " +fileName +"\tSize: "+sizeInMb+"MB");
-            print_ng("Uploader > "+"Uploading "+"\tFile hash: " + hash);
+            print_nng("Uploader > "+"Uploading "+"\tFile hash: " + hash);
 
             return ResponseEntity.ok()
                     .headers(headers)

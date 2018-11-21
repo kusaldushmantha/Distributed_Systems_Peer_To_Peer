@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -17,6 +18,7 @@ public class Downloader {
     private static final String SAVE_DIR = "downloaded_files";
 
     private static final int BUFFER_SIZE = 4096;
+    private static final int TIMEOUT = 10000;
 
 
     public static void downloadFile(String fileURL){
@@ -38,6 +40,7 @@ public class Downloader {
 
             URL url = new URL(urlEncodedName);
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+            httpConn.setConnectTimeout(TIMEOUT);
             int responseCode = httpConn.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -81,7 +84,7 @@ public class Downloader {
                 String hash = getHash(new File(saveFilePath));
 
                 print_ng("Downloader > " + "Calculated hash: \t" +hash);
-                print_ng("Downloader > " + "Server sent hash: \t" +hashSentByServer);
+                print_nng("Downloader > " + "Server sent hash: \t" +hashSentByServer);
 
 
             } else {
@@ -89,7 +92,9 @@ public class Downloader {
             }
             httpConn.disconnect();
         }catch (ArrayIndexOutOfBoundsException e){
-            print_ng("Downloader > " + "please define file name");
+            print_nng("Downloader > " + "please define file name");
+        }catch (SocketTimeoutException e){
+            print_nng("Downloader > " + "connection timeout");
         }
         catch (Exception e){
             e.printStackTrace();
