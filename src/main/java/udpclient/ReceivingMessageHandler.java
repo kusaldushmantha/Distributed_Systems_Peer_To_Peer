@@ -10,6 +10,7 @@ import static udpclient.Util.*;
 
 public class ReceivingMessageHandler {
 
+    static List<String> searchedList = new ArrayList<>();
     public static void registrationOk(StringTokenizer st) {
 
         int no_of_nodes= Integer.parseInt(st.nextToken());
@@ -192,6 +193,21 @@ public class ReceivingMessageHandler {
         int port_file_owner= Integer.parseInt(st.nextToken());
         int hops= Integer.parseInt(st.nextToken());
 
+        if(searchedList.size()==0){
+            searchedList.add(ip_file_owner);
+        }else {
+            int counter = 0;
+            for (String serached : searchedList){
+                if(ip_file_owner.equals(serached)){
+                    break;
+                }else counter+=1;
+            }
+            if(searchedList.size()>counter){
+                searchedList.add(ip_file_owner);
+            }
+        }
+
+
         switch (no_of_files) {
             case 0:
                 print_Success("Searching");
@@ -241,8 +257,12 @@ public class ReceivingMessageHandler {
         int hops=0;
         try {
             hops= Integer.parseInt(hopsStr);
-        }catch (Exception e){
+        }catch (Exception e) {
             e.printStackTrace();
+        }
+        //reset the hops count
+        if((myIp.equals(ip_file_needed))&&(myPort==port_file_needed)){
+            hops = 0;
         }
 
         //searching files locally
@@ -253,12 +273,33 @@ public class ReceivingMessageHandler {
             filesStr+="\""+file+ "\" ";
         }
 
+
         String msg="SEROK "+ foundFiles.size() + " " + myIp + " " + tomcatPort +" " + hops + " " + filesStr.trim() ;
         String msg_formatted = formatMessage(msg);
         sendPacket(ip_file_needed,port_file_needed,msg_formatted, "Search Ok");
 
+        //all hops searched identify
+        boolean msgForward = true;
+        if((myIp.equals(ip_file_needed))&&(myPort==port_file_needed)){
+            if(foundFiles.size()==0){
+                int counter = 0;
+                for (Map.Entry<String,Node> entry: getRoutingTable().entrySet()) {
+                    for (String serached : searchedList){
+                        if(entry.getValue().getIp().equals(serached)){
+                            counter+=1;
+                        }
+                    }
+
+                }
+                if(counter==getRoutingTable().size()){
+                    msgForward = false;
+                }else msgForward = true;
+
+            }
+        }
+
         print_nng("File data sent to "+ip_file_needed+":"+port_file_needed);
-        if(foundFiles.size()==0){
+        if((foundFiles.size()==0)&&msgForward){
             Random random = new Random();
             List<String> keys = new ArrayList<String>(getRoutingTable().keySet());
             String randomKey = keys.get( random.nextInt(keys.size()) );

@@ -149,8 +149,7 @@ public class SendingMessageHandler {
      */
     public static void searchFile(String filename,int hops){
         /* length SER IP port file_name hops */
-
-
+        ReceivingMessageHandler.searchedList.clear();
         String msg = "SER " + myIp + " " + myPort + " \"" + filename + "\" " + hops;
         String msg_formatted = formatMessage(msg);
         sendPacket(myIp, myPort, msg_formatted, "Search");
