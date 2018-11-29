@@ -5,57 +5,60 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.embedded.tomcat.ConnectorStartFailedException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import udpclient.Client;
+import clientFiles.Client;
 
 import java.util.HashMap;
 import java.util.Scanner;
 
-import static udpclient.Client.*;
-import static udpclient.Printer.*;
-import static udpclient.Util.isPortAvailable;
+import static clientFiles.Client.*;
+import static clientFiles.Util.isPortAvailable;
 
 @SpringBootApplication
 @ComponentScan(
         basePackages={"springshell"
                 , "springboot"
                 , "springboot.rest"
-                , "udpclient"
+                , "clientFiles"
         })
-public class SpringBootWithShellApplication {
+public class MainApplication {
 
     public static ApplicationContext ctx;
 
 
     public static int tomcatPort=8080;
 
+    public static void titlePrinter(){
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("--------------------------------");
+        buffer.append("\n Distributed System - Client")
+                .append("\n");
+        buffer.append("--------------------------------");
+        System.out.println( buffer.toString());
+    }
+
+
     public static void main(String[] args) throws Exception{
 
-        printName();
-        Client.initiateClient(false);
+        titlePrinter();
+        Client.startClient(false);
 
         getTomCatPort();
-        print_nn("\n\t\t"+"IP : " + myIp + " \tUsername : " +myUserName +"\n"
-                + "\t\tUDP Port : " +myPort
-                + " \tREST port : " +tomcatPort, "\033[0;1m");
         try {
 
             HashMap<String, Object> props = new HashMap<>();
             props.put("server.port", tomcatPort);
 
-            System.out.println("\t\tStarting REST on port "+tomcatPort+" ... ");
+            System.out.println("\nIP: "+myIp);
+            System.out.println("Starting Client services... ");
             ctx = new SpringApplicationBuilder()
-                    .sources(SpringBootWithShellApplication.class)
+                    .sources(MainApplication.class)
                     .properties(props)
                     .run(args);
 
-//            ctx = SpringApplication.run(SpringBootWithShellApplication.class);
         }catch (ConnectorStartFailedException e){
-            print_ng("Port is used by another process");
+            System.out.println("ERROR ==> Port is already in use!");
             System.exit(0);
         }
-
-
-
     }
 
 
@@ -68,14 +71,14 @@ public class SpringBootWithShellApplication {
 
         Scanner scanner=new Scanner(System.in);
         while (true){
-            print("\t\tEnter REST port\t\t[" + defaultPort + "]\t: ");
+            System.out.print("Enter REST port (default: " + defaultPort + "): ");
             String inPort=scanner.nextLine();
             if (inPort.equals("")) {
                 if (isPortAvailable(defaultPort)){
                     tomcatPort=defaultPort;
                     break;
                 }else {
-                    print_ng("\t\tPermission denied. Use a different port");
+                    System.out.println("ERROR ==> Permission denied. Use a different port!");
                     defaultPort++;
                 }
             }else {
@@ -84,10 +87,10 @@ public class SpringBootWithShellApplication {
                     if (isPortAvailable(tomcatPort)){
                         break;
                     }else {
-                        print_ng("\t\tPermission denied. Use a different port");
+                        System.out.println("ERROR ==> Permission denied. Use a different port!");
                     }
                 }catch (NumberFormatException e){
-                    print_ng("\t\tWrong input for port");
+                    System.out.println("ERROR ==> Please enter a valid port number");
                 }
             }
         }

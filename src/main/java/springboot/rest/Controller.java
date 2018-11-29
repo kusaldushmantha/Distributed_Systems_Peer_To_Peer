@@ -14,11 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 public class Controller {
 
     @Autowired
-    UploadService uploadService;
+    UploadHandler uploadService;
 
     @RequestMapping("/")
     public String welcome(){
-        System.out.println("welcome came");
         return "Welcome";
     }
 

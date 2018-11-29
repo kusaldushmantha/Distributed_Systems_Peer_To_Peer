@@ -1,4 +1,4 @@
-package udpclient;
+package clientFiles;
 
 public class Node {
 
@@ -47,20 +47,14 @@ public class Node {
     }
 
 
-    public String details() {
-        return "Neighbour[ " +
-                "ip=" + ip +
-                ", port=" + port +
-//                ", userName='" + userName + '\'' +
-                " ]";
+    public String toStringNeighbour() {
+        return "\tip = " + ip + " port = " + port;
     }
 
     @Override
     public String toString() {
-        return "Node[ " +
-                "ip='" + ip + '\'' +
-                ", port=" + port +
-                ", userName='" + userName + '\'' +
-                " ]";
+        return "ip = '" + ip + '\'' +
+                ", port = " + port +
+                ", userName = '" + userName;
     }
 }

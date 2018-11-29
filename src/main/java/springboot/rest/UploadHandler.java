@@ -6,7 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import udpclient.Client;
+import clientFiles.Client;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,12 +16,10 @@ import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.util.Random;
 
-import static udpclient.Printer.print_ng;
-import static udpclient.Printer.print_nng;
-import static udpclient.Util.getHash;
+import static clientFiles.Util.getHash;
 
 @Component
-public class UploadService {
+public class UploadHandler {
 
     private Random random = new Random();
     private int fileSizeLower=2;
@@ -31,12 +29,12 @@ public class UploadService {
 
         final boolean fileExist = Client.selectedFiles.contains(fileName);
 
-        print_ng("Uploader > "+" Got request"+"\tFile name: "+fileName+"\tfile exist: "+fileExist);
+        System.out.println("File Upload ==> > requested "+"\tFile: "+fileName+"\tfile exist: "+fileExist);
 
         if (fileExist && fileName!=""){
                 return sendFile(fileName);
         }else {
-            print_ng("Uploader > "+"Sending 'Not Found'");
+            System.out.println("File Upload Error ==> Sending Not Found");
             return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -71,8 +69,8 @@ public class UploadService {
 
 
             int sizeInMb=length/(1024*1024);
-            print_ng("Uploader > "+"Uploading\t"+ "File name: " +fileName +"\tSize: "+sizeInMb+"MB");
-            print_nng("Uploader > "+"Uploading "+"\tFile hash: " + hash);
+//            System.out.println("File Upload ==> File: " +fileName +" of Size: "+sizeInMb+"MB");
+            System.out.println("File Upload ==> File: " +fileName +" with hash: "+sizeInMb+"MB");
 
             return ResponseEntity.ok()
                     .headers(headers)

@@ -76,7 +76,7 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.6.0</version>
 				<configuration>
-					<mainClass>springboot.SpringBootWithShellApplication</mainClass>
+					<mainClass>springboot.MainApplication</mainClass>
 				</configuration>
 			</plugin>
 

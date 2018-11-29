@@ -1,6 +1,6 @@
-package udpclient;
+package clientFiles;
 
-public class Status {
+public class StatusHandler {
     private int routingTableStatus=0;
 
     private int gossipSendingStatus=0;

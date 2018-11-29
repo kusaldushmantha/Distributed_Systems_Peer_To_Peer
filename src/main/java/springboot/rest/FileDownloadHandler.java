@@ -1,4 +1,4 @@
-package filedownloader;
+package springboot.rest;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,12 +8,9 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import static udpclient.Printer.print_n;
-import static udpclient.Printer.print_ng;
-import static udpclient.Printer.print_nng;
-import static udpclient.Util.getHash;
+import static clientFiles.Util.getHash;
 
-public class Downloader {
+public class FileDownloadHandler {
 
     private static final String SAVE_DIR = "downloaded_files";
 
@@ -78,23 +75,23 @@ public class Downloader {
 
 
                 int sizeInMb=contentLength/(1024*1024);
-
-                print_ng("Downloader > "+"Downloaded\t"+ "File name: " +fileName +"\tSize: "+sizeInMb+"MB");
+//                System.out.println("File Download ==> "+fileName+" of size"+sizeInMb+"MB");
+                System.out.println("File Download ==> "+fileName+" of size"+sizeInMb+"MB");
 
                 String hash = getHash(new File(saveFilePath));
 
-                print_ng("Downloader > " + "Calculated hash: \t" +hash);
-                print_nng("Downloader > " + "Server sent hash: \t" +hashSentByServer);
+//                print_ng("FileDownloadHandler > " + "Calculated hash: \t" +hash);
+//                print_nng("FileDownloadHandler > " + "Server sent hash: \t" +hashSentByServer);
 
 
             } else {
-                System.out.println("No file to download. Server replied HTTP code: " + responseCode);
+                System.out.println("File Download ==> No file to download. Server replied HTTP code: " + responseCode);
             }
             httpConn.disconnect();
         }catch (ArrayIndexOutOfBoundsException e){
-            print_nng("Downloader > " + "please define file name");
+            System.out.println("File Download Error ==> " + "no file name!");
         }catch (SocketTimeoutException e){
-            print_nng("Downloader > " + "connection timeout");
+            System.out.println("File download Error ==> " + "connection timeout");
         }
         catch (Exception e){
             e.printStackTrace();
